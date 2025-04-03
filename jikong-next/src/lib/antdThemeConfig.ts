@@ -8,9 +8,10 @@ const theme: ThemeConfig = {
   components: {
     Menu: {
       itemSelectedBg: "rgb(22, 119, 255)",
-      itemSelectedColor: "rgb(253, 250, 250)",
+      itemSelectedColor: "rgb(255, 255, 255)",
       colorPrimary: "rgb(0, 0, 0)",
       iconMarginInlineEnd: 20,
+      activeBarBorderWidth: 0,
     },
   },
 };

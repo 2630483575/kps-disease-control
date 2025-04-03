@@ -15,8 +15,9 @@
 }
 
 @theme {
-  --radius-list: 10px;
+  --radius-list: 12px;
   --shadow-list: "0px 0px 6px 1px rgba(8, 57, 87, 0.1)";
+  --color-background: rgba(226, 221, 221, 0.5);
 }
 
 html,
