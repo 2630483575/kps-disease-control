@@ -1,0 +1,6 @@
+/* 用tailwind样式会被antd覆盖 */
+.icon {
+    font-size: 24px;
+    cursor: pointer;
+    color:rgb(148 163 184);
+}
