@@ -13,6 +13,12 @@ const theme: ThemeConfig = {
       iconMarginInlineEnd: 20,
       activeBarBorderWidth: 0,
     },
+    Button: {
+      colorPrimary: "#1677ff",
+    },
+    Table: {
+      padding: 24,
+    },
   },
 };
 
