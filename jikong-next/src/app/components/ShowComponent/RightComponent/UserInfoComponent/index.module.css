@@ -1,0 +1,8 @@
+.add-modal-content {
+  background: linear-gradient(to bottom, #a0c4f5, #ffffff);
+  /* 设置从蓝色（#3498db）到白色（#ffffff）的垂直线性渐变色 */
+}
+
+.add-modal-header {
+  background-color: transparent !important;
+}

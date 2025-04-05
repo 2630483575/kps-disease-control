@@ -1,8 +1,10 @@
-import { Input } from "antd";
-import type { GetProps } from "antd";
-import { Button, Space, Table, Tag } from "antd";
+import React, { useState } from "react";
+import { Input, Modal, Button, Space, Table, Tag } from "antd";
+import type { GetProps, TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import type { TableProps } from "antd";
+import styles from "./index.module.css";
+
+import AddUser from "./AddUser";
 
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search } = Input;
@@ -16,6 +18,7 @@ interface DataType {
   createTime: string;
   status: number;
 }
+// 列的定义
 const columns: TableProps<DataType>["columns"] = [
   {
     title: "序号",
@@ -87,6 +90,7 @@ const columns: TableProps<DataType>["columns"] = [
 //     status: 1,
 //   },
 // ];
+// table的数据
 const data = Array.from({ length: 100 }).map<DataType>((_, i) => ({
   key: i + 1,
   userName: "irelia",
@@ -98,8 +102,23 @@ const data = Array.from({ length: 100 }).map<DataType>((_, i) => ({
 }));
 
 export default function UserInfo() {
+  const addModalClassNames = {
+    header: styles["add-modal-header"],
+    content: styles["add-modal-content"],
+  };
   const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
     console.log(info?.source, value);
+  };
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const showAddUserModal = () => {
+    setIsAddUserModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsAddUserModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsAddUserModalOpen(false);
   };
   return (
     <>
@@ -136,7 +155,12 @@ export default function UserInfo() {
           </Button>
         </div>
         <div>
-          <Button type="primary" size="large" icon={<PlusOutlined />}>
+          <Button
+            type="primary"
+            size="large"
+            icon={<PlusOutlined />}
+            onClick={showAddUserModal}
+          >
             添加用户
           </Button>
         </div>
@@ -148,6 +172,16 @@ export default function UserInfo() {
           className="h-full"
         />
       </div>
+      <Modal
+        title="添加用户"
+        open={isAddUserModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={600}
+        classNames={addModalClassNames}
+      >
+        <AddUser />
+      </Modal>
     </>
   );
 }
