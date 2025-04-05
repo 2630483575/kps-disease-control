@@ -1,5 +1,4 @@
-import type { FormProps } from "antd";
-import { Form, Input, Select, Button, Radio } from "antd";
+import { Form, Input, Select, Radio } from "antd";
 const { TextArea } = Input;
 export default function AddUser() {
   return (
