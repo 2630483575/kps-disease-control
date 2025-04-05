@@ -22,6 +22,16 @@ export default function TitleComponent(props: any) {
           </div>
         </>
       )}
+      {props.type === "permissionManage" && (
+        <>
+          <div className="h-[50px] flex flex-col justify-start">
+            <span className="text-[24px] font-semibold">权限管理</span>
+          </div>
+          <div className="flex-1 flex flex-col justify-start">
+            <span className="text-slate-500">掌管系统角色和权限</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
