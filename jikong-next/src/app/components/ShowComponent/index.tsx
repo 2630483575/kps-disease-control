@@ -2,13 +2,15 @@
 import UserManage from "./UserManage";
 import DictManage from "./DictManage";
 import PermissionManage from "./PermissionManage";
-export default function ShowComponent(props: any) {
+import { useSideStore } from "@/app/store/useSideStore";
+export default function ShowComponent() {
+  const activeSideMenu = useSideStore((state) => state.sideSelected);
   return (
     <div className="flex-1 overflow-auto p-[24px] bg-background">
       <div className="h-full shadow-list rounded-list bg-[#fff] p-[16px] flex flex-col">
-        {props.type === "userManage" && <UserManage />}
-        {props.type === "dictManage" && <DictManage />}
-        {props.type === "permissionManage" && <PermissionManage />}
+        {activeSideMenu === "userManage" && <UserManage />}
+        {activeSideMenu === "dictManage" && <DictManage />}
+        {activeSideMenu === "permissionManage" && <PermissionManage />}
       </div>
     </div>
   );

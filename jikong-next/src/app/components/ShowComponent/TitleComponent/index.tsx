@@ -2,7 +2,7 @@
 export default function TitleComponent(props: any) {
   return (
     <div className="w-full h-[80px] bg-[#fff] flex flex-col">
-      {props.type === "UserManage" && (
+      {props.type === "userManage" && (
         <>
           <div className="h-[50px] flex flex-col justify-start">
             <span className="text-[24px] font-semibold">系统管理</span>

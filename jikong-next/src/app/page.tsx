@@ -10,7 +10,7 @@ function App() {
       <Nav />
       <div className="flex-1 flex overflow-y-hidden">
         <Side />
-        <ShowComponent type={"permissionManage"} />
+        <ShowComponent />
       </div>
     </div>
   );

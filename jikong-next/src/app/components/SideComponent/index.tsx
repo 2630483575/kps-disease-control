@@ -2,24 +2,26 @@
 import { Menu } from "antd";
 import type { MenuProps } from "antd";
 import { DesktopOutlined } from "@ant-design/icons";
+import { useSideStore } from "@/app/store/useSideStore";
 
 type MenuItem = Required<MenuProps>["items"][number];
 const items: MenuItem[] = [
   {
-    key: "sub1",
+    key: "systemManage",
     label: "系统管理",
     icon: <DesktopOutlined />,
     children: [
-      { key: "1", label: "用户管理" },
-      { key: "2", label: "字典维护" },
-      { key: "3", label: "权限管理" },
+      { key: "userManage", label: "用户管理" },
+      { key: "dictManage", label: "字典维护" },
+      { key: "permissionManage", label: "权限管理" },
     ],
   },
 ];
 export default function Side() {
   const onClick: MenuProps["onClick"] = (e) => {
-    console.log("click ", e);
+    setActiveSideMenu(e.key);
   };
+  const setActiveSideMenu = useSideStore((state) => state.setSideSelected);
   return (
     <div className="w-[200px]">
       <Menu
