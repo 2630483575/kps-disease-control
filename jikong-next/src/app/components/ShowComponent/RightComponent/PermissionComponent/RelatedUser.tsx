@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { Input, Button, Space, Table, Modal, Tag } from "antd";
 import type { GetProps, TableProps } from "antd";

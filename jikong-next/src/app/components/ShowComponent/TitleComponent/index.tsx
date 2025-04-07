@@ -5,10 +5,10 @@ export default function TitleComponent(props: any) {
       {props.type === "userManage" && (
         <>
           <div className="h-[50px] flex flex-col justify-start">
-            <span className="text-[24px] font-semibold">系统管理</span>
+            <span className="text-[24px] font-semibold">用户管理</span>
           </div>
           <div className="flex-1 flex flex-col justify-start">
-            <span className="text-slate-500">掌管系统管理权限</span>
+            <span className="text-slate-500">掌管用户管理权限</span>
           </div>
         </>
       )}

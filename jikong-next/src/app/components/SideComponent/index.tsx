@@ -27,8 +27,8 @@ export default function Side() {
       <Menu
         onClick={onClick}
         className="w-full h-full"
-        defaultSelectedKeys={["1"]}
-        defaultOpenKeys={["sub1"]}
+        defaultSelectedKeys={["userManage"]}
+        defaultOpenKeys={["systemManage"]}
         mode="inline"
         items={items}
       />

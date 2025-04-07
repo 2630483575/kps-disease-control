@@ -1,6 +1,7 @@
 "use client";
 import { Menu } from "antd";
 import type { MenuProps } from "antd";
+import { useUserLeftMenuStore } from "@/app/store/useUserStore";
 type MenuItem = Required<MenuProps>["items"][number];
 const items: MenuItem[] = [
   {
@@ -24,8 +25,12 @@ const items: MenuItem[] = [
 ];
 export default function DepMenu() {
   const onClick: MenuProps["onClick"] = (e) => {
-    console.log("click ", e);
+    setUserLeftMenu(e.key);
   };
+
+  const setUserLeftMenu = useUserLeftMenuStore(
+    (state) => state.setUserLeftSelected
+  );
   return (
     <>
       <Menu

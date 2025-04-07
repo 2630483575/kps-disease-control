@@ -1,3 +1,4 @@
+"use client";
 // 整个大的内容页面 根据左边选择展示不同组件
 import UserManage from "./UserManage";
 import DictManage from "./DictManage";

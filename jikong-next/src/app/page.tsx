@@ -1,18 +1,13 @@
 "use client";
 import "@ant-design/v5-patch-for-react-19";
-import Nav from "./components/NavComponent";
-import Side from "./components/SideComponent";
-import ShowComponent from "./components/ShowComponent";
+
+import Login from "./login";
 
 function App() {
   return (
-    <div className="h-full w-full bg-inherit flex flex-col">
-      <Nav />
-      <div className="flex-1 flex overflow-y-hidden">
-        <Side />
-        <ShowComponent />
-      </div>
-    </div>
+    <>
+      <Login />
+    </>
   );
 }
 export default App;

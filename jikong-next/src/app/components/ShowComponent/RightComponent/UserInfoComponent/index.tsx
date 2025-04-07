@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { Input, Modal, Button, Space, Table, Tag } from "antd";
 import type { GetProps, TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
-
+import { useUserLeftMenuStore } from "@/app/store/useUserStore";
 import AddUser from "./AddUser";
+import fetchApi from "@/lib/fetchApi";
 
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search } = Input;
@@ -77,19 +79,6 @@ const columns: TableProps<DataType>["columns"] = [
     ),
   },
 ];
-
-// 造的假数据
-// const data: DataType[] = [
-//   {
-//     key: 1,
-//     userName: "irelia",
-//     phone: "16677788888",
-//     email: "idydjusys@163.com",
-//     roleName: "数据分析师",
-//     createTime: "2024-9-5 11:12:36",
-//     status: 1,
-//   },
-// ];
 // table的数据
 const data = Array.from({ length: 100 }).map<DataType>((_, i) => ({
   key: i + 1,
@@ -120,6 +109,10 @@ export default function UserInfo() {
   const handleCancel = () => {
     setIsAddUserModalOpen(false);
   };
+  const userLeftMenu = useUserLeftMenuStore((state) => state.userLeftSelected);
+  useEffect(() => {
+    // 调接口,根据选中的部门获取用户列表数据
+  }, [userLeftMenu]);
   return (
     <>
       <div className="h-[100px] flex gap-4 flex-wrap">
