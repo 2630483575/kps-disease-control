@@ -1,5 +1,6 @@
 import { getAxios, postAxios } from "../utils/axios";
 
-// export const getArticle = (url: string, params: object) => {
-//   return getAxios({ url, params });
-// };
+// 用户登录
+export const userLogin = (data: object) => {
+  return postAxios({ url: "/user/login", data });
+};

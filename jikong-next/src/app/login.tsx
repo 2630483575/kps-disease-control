@@ -1,14 +1,19 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { Children, useEffect } from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import { useRouter } from "next/navigation";
+import { userLogin } from "./service/loginService";
+import { log } from "console";
 
 export default function Login() {
   const router = useRouter();
-  const userLogin = async () => {};
+  const login = async () => {
+    // const data = await userLogin({ userName: "ppp" });
+  };
   const onFinish = (values: any) => {
-    // router.push("/SystemManage");
+    login();
+    router.push("/SystemManage");
   };
   return (
     <div className="flex h-full w-full">

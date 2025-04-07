@@ -4,7 +4,7 @@ import LabelInfo from "./LabelInfoComponent";
 import PermissionComponent from "./PermissionComponent";
 export default function RightComponent(props: any) {
   return (
-    <div className="flex-1 flex flex-col p-[16px] gap-4 ">
+    <div className="flex-1 flex flex-col p-[16px] overflow-auto">
       {props.type === "userManage" && <UserInfo />}
       {props.type === "tagManage" && <LabelInfo />}
       {props.type === "permissionManage" && <PermissionComponent />}

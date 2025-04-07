@@ -6,7 +6,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
 import { useUserLeftMenuStore } from "@/app/store/useUserStore";
 import AddUser from "./AddUser";
-import fetchApi from "@/lib/fetchApi";
 
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search } = Input;

@@ -106,7 +106,7 @@ export default function RelatedUser() {
             icon={<PlusOutlined />}
             onClick={showAddUserModal}
           >
-            添加标签
+            添加关联用户
           </Button>
         </div>
       </div>
