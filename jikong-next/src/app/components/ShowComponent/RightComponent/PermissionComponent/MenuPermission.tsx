@@ -129,7 +129,7 @@ export default function MenuPermission() {
         onCheck={onCheck}
         treeData={treeData}
       />
-      <div className=" flex justify-center ">
+      <div className="flex justify-center mt-auto">
         <Button type="primary" className="w-[400px]" onClick={onClick}>
           保存修改
         </Button>
