@@ -6,128 +6,200 @@ import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
 import { useUserLeftMenuStore } from "@/app/store/useUserStore";
 import AddUser from "./AddUser";
+import { DataType, userResType } from "@/app/types/user";
+import fetchApi from "@/lib/fetchApi";
+import type { TablePaginationConfig } from "antd/es/table";
+import { roleDataType } from "@/app/types/role";
+import { optionType } from "@/app/types/select";
+
+interface PaginationState extends TablePaginationConfig {
+  current: number;
+  pageSize: number;
+}
 
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search } = Input;
 
-interface DataType {
-  key: number;
-  userName: string;
-  phone: string;
-  email: string;
-  roleName: string;
-  createTime: string;
-  status: number;
-}
-// 列的定义
-const columns: TableProps<DataType>["columns"] = [
-  {
-    title: "序号",
-    dataIndex: "key",
-    key: "key",
-  },
-  {
-    title: "用户名称",
-    dataIndex: "userName",
-    key: "userName",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "手机号",
-    dataIndex: "phone",
-    key: "phone",
-  },
-  {
-    title: "邮箱",
-    dataIndex: "email",
-    key: "email",
-  },
-  {
-    title: "角色",
-    dataIndex: "roleName",
-    key: "roleName",
-  },
-  {
-    title: "创建时间",
-    dataIndex: "createTime",
-    key: "createTime",
-  },
-  {
-    title: "状态",
-    key: "status",
-    dataIndex: "status",
-    render: (_, { status }) => {
-      let color = status === 1 ? "volcano" : "green";
-      let statusName = status === 1 ? "停用" : "正常";
-      return (
-        <Tag color={color} key={statusName}>
-          {statusName}
-        </Tag>
-      );
-    },
-  },
-  {
-    title: "操作",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>编辑</a>
-        <a>重置密码</a>
-        <a>删除</a>
-      </Space>
-    ),
-  },
-];
-// table的数据
-const data = Array.from({ length: 100 }).map<DataType>((_, i) => ({
-  key: i + 1,
-  userName: "irelia",
-  phone: "16677788888",
-  email: "idydjusys@163.com",
-  roleName: "数据分析师",
-  createTime: "2024-9-5 11:12:36",
-  status: 1,
-}));
-
+const addModalClassNames = {
+  header: styles["add-modal-header"],
+  content: styles["add-modal-content"],
+};
 export default function UserInfo() {
-  const addModalClassNames = {
-    header: styles["add-modal-header"],
-    content: styles["add-modal-content"],
+  // 列的定义
+  const columns: TableProps<DataType>["columns"] = [
+    {
+      title: "序号",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "用户名称",
+      dataIndex: "userName",
+      key: "userName",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "手机号",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+    },
+    {
+      title: "邮箱",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "角色",
+      dataIndex: "roleName",
+      key: "roleName",
+    },
+    {
+      title: "创建时间",
+      dataIndex: "createTime",
+      key: "createTime",
+    },
+    {
+      title: "状态",
+      key: "status",
+      dataIndex: "status",
+      render: (_, { status }) => {
+        let color = status === 1 ? "volcano" : "green";
+        let statusName = status === 1 ? "停用" : "正常";
+        return (
+          <Tag color={color} key={statusName}>
+            {statusName}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "操作",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <a onClick={() => handleUserEdit(record)}>编辑</a>
+          <a onClick={resetPassword}>重置密码</a>
+          <a onClick={deleteUser}>删除</a>
+        </Space>
+      ),
+    },
+  ];
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [username, setUserName] = useState("");
+  const [tableData, setTableData] = useState<DataType[]>([]);
+  const [allRoleInfo, setAllRoleInfo] = useState<optionType[]>([]);
+  const [modalMode, setModalMode] = useState("add");
+  const [editData, setEditData] = useState<DataType>({});
+  const [pagination, setPagination] = useState<PaginationState>({
+    current: 1,
+    pageSize: 10,
+  });
+  const userLeftSelected = useUserLeftMenuStore(
+    (state) => state.userLeftSelected
+  );
+  const getUserList = (page = 1, pageSize = 10) => {
+    fetchApi
+      .post("/system/user/selectUsers", {
+        phoneNumber: phoneNumber,
+        deptId: userLeftSelected,
+        username: username,
+        pageNo: pagination.current,
+        pageSize: pagination.pageSize,
+        orderBy: "user_id",
+      })
+      .then((res) => {
+        if (res.code === 200) {
+          setPagination({
+            current: res.data.currentPage,
+            pageSize: res.data.pageSize,
+          });
+          const allUsers = res.data.userList;
+          allUsers.map((user: userResType) => {
+            let roleName = user.roleNames?.join() ?? "";
+            return { ...user, roleName: roleName };
+          });
+          setTableData(allUsers);
+        }
+      });
   };
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
-    console.log(info?.source, value);
+  const reset = () => {
+    fetchApi
+      .post("/system/user/selectUsers", {
+        phoneNumber: "",
+        deptId: userLeftSelected,
+        username: "",
+        pageNo: 1,
+        pageSize: 10,
+        orderBy: "user_id",
+      })
+      .then((res) => {
+        if (res.code === 200) {
+          setPagination({
+            current: res.data.currentPage,
+            pageSize: res.data.pageSize,
+          });
+          const allUsers = res.data.userList;
+          allUsers.map((user: userResType) => {
+            let roleName = user.roleNames?.join() ?? "";
+            return { ...user, roleName: roleName };
+          });
+          setTableData(allUsers);
+        }
+      });
+  };
+  // 左边选中的menuItem改变就重新获取数据
+  useEffect(() => {
+    getUserList();
+  }, [userLeftSelected]);
+  const handleTableChange = (newPagination: TablePaginationConfig) => {
+    getUserList(newPagination.current, newPagination.pageSize);
   };
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const showAddUserModal = () => {
+    fetchApi.get("/system/role/listRoleAll").then((res) => {
+      if (res.code === 200) {
+        const allData = JSON.parse(JSON.stringify(res.data));
+        const roleSelectData = allData.map((opt: roleDataType) => ({
+          value: opt.roleId,
+          label: opt.roleName,
+        }));
+
+        setAllRoleInfo(roleSelectData);
+      }
+    });
     setIsAddUserModalOpen(true);
   };
-  const handleOk = () => {
-    setIsAddUserModalOpen(false);
-  };
-
   const handleCancel = () => {
     setIsAddUserModalOpen(false);
   };
-  const userLeftMenu = useUserLeftMenuStore((state) => state.userLeftSelected);
-  useEffect(() => {
-    // 调接口,根据选中的部门获取用户列表数据
-  }, [userLeftMenu]);
+  const handleUserEdit = (record: DataType) => {
+    setIsAddUserModalOpen(true);
+    setModalMode("edit");
+    setEditData(record);
+  };
+  const resetPassword = () => {};
+  const deleteUser = () => {};
+
   return (
     <>
       <div className="h-[100px] flex gap-4 flex-wrap">
         <div className="w-[300px]">
-          <Search
+          <Input
             placeholder="请输入手机号"
-            onSearch={onSearch}
             size="large"
+            onChange={(e) => {
+              setPhoneNumber(e.target.value);
+            }}
             prefix={<label>手机号:</label>}
           />
         </div>
         <div className="w-[300px]">
-          <Search
+          <Input
             placeholder="请输入用户姓名"
-            onSearch={onSearch}
             size="large"
+            onChange={(e) => {
+              setUserName(e.target.value);
+            }}
             prefix={<label>用户姓名:</label>}
           />
         </div>
@@ -137,12 +209,21 @@ export default function UserInfo() {
             variant="filled"
             size="large"
             className="w-[100px]"
+            onClick={() => {
+              getUserList();
+            }}
           >
             查询
           </Button>
         </div>
         <div>
-          <Button size="large" className="w-[100px]">
+          <Button
+            size="large"
+            className="w-[100px]"
+            onClick={() => {
+              reset();
+            }}
+          >
             重置
           </Button>
         </div>
@@ -160,19 +241,27 @@ export default function UserInfo() {
       <div className="flex-1 h-full overflow-auto">
         <Table<DataType>
           columns={columns}
-          dataSource={data}
+          dataSource={tableData}
           className="h-full"
+          pagination={pagination}
+          onChange={handleTableChange}
+          rowKey={"id"}
         />
       </div>
       <Modal
         title="添加用户"
         open={isAddUserModalOpen}
-        onOk={handleOk}
+        footer={null}
         onCancel={handleCancel}
         width={600}
         classNames={addModalClassNames}
       >
-        <AddUser />
+        <AddUser
+          closeModal={() => setIsAddUserModalOpen(false)}
+          roleList={allRoleInfo}
+          mode={modalMode}
+          editData={editData}
+        />
       </Modal>
     </>
   );

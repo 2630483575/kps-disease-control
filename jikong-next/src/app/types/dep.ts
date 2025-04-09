@@ -6,7 +6,7 @@ export type IdeplistData = {
 };
 
 export type leftDepMenu = {
-  key: string;
+  key: number;
   label: string;
   children: leftDepMenu[];
 };
