@@ -2,7 +2,7 @@
 export default function TitleComponent(props: any) {
   return (
     <div className="w-full h-[80px] bg-[#fff] flex flex-col">
-      {props.type === "userManage" && (
+      {props.type === "UserManage" && (
         <>
           <div className="h-[50px] flex flex-col justify-start">
             <span className="text-[24px] font-semibold">用户管理</span>
@@ -22,7 +22,7 @@ export default function TitleComponent(props: any) {
           </div>
         </>
       )}
-      {props.type === "permissionManage" && (
+      {props.type === "PermissionManage" && (
         <>
           <div className="h-[50px] flex flex-col justify-start">
             <span className="text-[24px] font-semibold">权限管理</span>

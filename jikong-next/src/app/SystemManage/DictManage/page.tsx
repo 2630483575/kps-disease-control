@@ -1,6 +1,6 @@
-import TitleComponent from "../TitleComponent";
-import LeftComponent from "../LeftComponent";
-import RightComponent from "../RightComponent";
+import TitleComponent from "../../components/ShowComponent/TitleComponent";
+import LeftComponent from "../../components/ShowComponent/LeftComponent";
+import RightComponent from "../../components/ShowComponent/RightComponent";
 
 export default function DictManage() {
   return (

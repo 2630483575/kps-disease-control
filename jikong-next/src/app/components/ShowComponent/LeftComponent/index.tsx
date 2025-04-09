@@ -5,9 +5,9 @@ import RoleComponent from "./RoleComponent";
 export default function LeftComponent(props: any) {
   return (
     <div className="w-[300px] flex flex-col p-[16px] gap-4 border-r-[1px] border-slate-300">
-      {props.type === "userManage" && <DepComponent />}
+      {props.type === "UserManage" && <DepComponent />}
       {props.type === "tagManage" && <FileBusiComponent />}
-      {props.type === "permissionManage" && <RoleComponent />}
+      {props.type === "PermissionManage" && <RoleComponent />}
     </div>
   );
 }

@@ -16,7 +16,6 @@ export default function Login() {
       if (res.code === 200) {
         sessionStorage.setItem("tokenName", res.data.tokenName);
         sessionStorage.setItem("tokenValue", res.data.tokenValue);
-        // document.cookie = `${res.data.tokenName}=${res.data.tokenValue};path=/;domain=localhost`;
         router.push("/SystemManage");
       } else {
         messageApi.open({
@@ -25,28 +24,6 @@ export default function Login() {
         });
       }
     });
-    // axios.defaults.withCredentials = true;
-    // axios
-    //   .post(`${API_BASE_URL}/login`, {
-    //     username: "admin",
-    //     password: "123456",
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //     document.cookie = `${res.data.data.tokenName}=${res.data.data.tokenValue};path=/;domain=localhost`;
-    //     router.push("/SystemManage");
-    //     console.log(res);
-    //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //   });
-    // postAxios({
-    //   url: "/login",
-    //   data: { username: "admin", password: "123456" },
-    // }).then((res) => {
-    //   console.log(res);
-    //   router.push("/SystemManage");
-    // });
   };
   const onFinish = (values: logType) => {
     userLogin({ ...values });

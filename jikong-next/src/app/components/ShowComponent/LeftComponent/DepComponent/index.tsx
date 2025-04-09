@@ -15,27 +15,9 @@ export default function DepComponent() {
     getDepList(value);
   };
   const getDepList = async (depName: string) => {
-    // axios
-    //   .get(`${API_BASE_URL}/cdc/dept/simpleTree?deptName=${depName}`, {
-    //     headers: {
-    //       Authorization: "Bearer",
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //   });
     fetchApi.get("/cdc/dept/simpleTree", { deptName: depName }).then((res) => {
       console.log(res);
     });
-    // getAxios({
-    //   url: `cdc/dept/simpleTree`,
-    //   params: { deptName: depName },
-    // }).then((res) => {
-    //   console.log(res);
-    // });
   };
   return (
     <>

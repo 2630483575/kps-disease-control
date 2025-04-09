@@ -1,14 +1,6 @@
-import Nav from "../components/NavComponent";
-import Side from "../components/SideComponent";
-import ShowComponent from "../components/ShowComponent";
+"use client";
+import UserManage from "./UserManage/page";
+import { redirect } from "next/navigation";
 export default function SystemManage() {
-  return (
-    <div className="h-full w-full bg-inherit flex flex-col">
-      <Nav />
-      <div className="flex-1 flex overflow-y-hidden">
-        <Side />
-        <ShowComponent />
-      </div>
-    </div>
-  );
+  redirect("/SystemManage/UserManage");
 }

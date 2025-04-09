@@ -5,9 +5,9 @@ import PermissionComponent from "./PermissionComponent";
 export default function RightComponent(props: any) {
   return (
     <div className="flex-1 flex flex-col p-[16px] overflow-auto">
-      {props.type === "userManage" && <UserInfo />}
+      {props.type === "UserManage" && <UserInfo />}
       {props.type === "tagManage" && <LabelInfo />}
-      {props.type === "permissionManage" && <PermissionComponent />}
+      {props.type === "PermissionManage" && <PermissionComponent />}
     </div>
   );
 }

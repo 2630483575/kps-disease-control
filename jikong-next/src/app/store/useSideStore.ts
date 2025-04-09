@@ -5,6 +5,6 @@ interface SideMenuState {
   setSideSelected: (selectedItems: string) => void;
 }
 export const useSideStore = create<SideMenuState>((set) => ({
-  sideSelected: "userManage",
+  sideSelected: "UserManage",
   setSideSelected: (val) => set((state) => ({ sideSelected: val })),
 }));
