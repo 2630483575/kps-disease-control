@@ -27,3 +27,7 @@ export type userResType = {
 export type userByDept = {
   depId: number;
 };
+export type roleDataType = {
+  roleId?: number;
+  roleName?: string;
+};

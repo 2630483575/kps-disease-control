@@ -32,7 +32,7 @@ export default function DepComponent() {
     (state) => state.setUserLeftMenu
   );
 
-  const getDepList = async (depName: string) => {
+  const getDepList = (depName: string) => {
     fetchApi.get("/cdc/dept/simpleTree", { deptName: depName }).then((res) => {
       if (res.code === 200) {
         const leftDepListByName = depColumnConvert(res.data);

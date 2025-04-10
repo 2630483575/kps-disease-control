@@ -1,3 +1,4 @@
+import { useDictLeftMenuStore } from "@/app/store/useDictStore";
 import { tagDataType } from "@/app/types/dict";
 import fetchApi from "@/lib/fetchApi";
 import { Form, Input, Button, message } from "antd";
@@ -12,18 +13,19 @@ interface dictProps {
 }
 type FieldType = {
   tagName?: string;
-  order?: string;
+  rank?: string;
 };
 export default function AddTag({ mode, closeModal, editData }: dictProps) {
   const [messageApi, contextHolder] = message.useMessage();
+  const dictLeftSelected = useDictLeftMenuStore(
+    (state) => state.dictLeftSelected
+  );
   const [form] = Form.useForm();
   useEffect(() => {
-    console.log(editData);
-
     if (mode === "edit") {
       const initData = {
         tagName: editData.tagName,
-        // order: editData.order ?? 1,
+        rank: editData.rank,
       };
       form.setFieldsValue(initData);
     } else {
@@ -32,21 +34,35 @@ export default function AddTag({ mode, closeModal, editData }: dictProps) {
   }, [mode, editData]);
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     if (mode === "add") {
-      fetchApi.post("/cdc/tag/insert").then((res) => {
-        if (res.code === 200) {
-          messageApi.success(res.msg);
-        } else {
-          messageApi.error(res.msg);
-        }
-      });
+      fetchApi
+        .post("/cdc/tag/insert", {
+          tagName: values.tagName,
+          rank: values.rank,
+          categoryId: dictLeftSelected,
+        })
+        .then((res) => {
+          if (res.code === 200) {
+            messageApi.success(res.msg);
+            closeModal();
+          } else {
+            messageApi.error(res.msg);
+          }
+        });
     } else {
-      fetchApi.post("/cdc/tag/update").then((res) => {
-        if (res.code === 200) {
-          messageApi.success(res.msg);
-        } else {
-          messageApi.error(res.msg);
-        }
-      });
+      fetchApi
+        .post("/cdc/tag/update", {
+          tagName: values.tagName,
+          rank: values.rank,
+          tagId: editData.tagId,
+          categoryId: dictLeftSelected,
+        })
+        .then((res) => {
+          if (res.code === 200) {
+            messageApi.success(res.msg);
+          } else {
+            messageApi.error(res.msg);
+          }
+        });
     }
   };
   return (
@@ -71,7 +87,7 @@ export default function AddTag({ mode, closeModal, editData }: dictProps) {
 
         <Form.Item<FieldType>
           label="排序"
-          name="order"
+          name="rank"
           rules={[{ required: true, message: "请输入排序" }]}
         >
           <InputNumber style={{ width: "100%" }} placeholder="请输入排序" />

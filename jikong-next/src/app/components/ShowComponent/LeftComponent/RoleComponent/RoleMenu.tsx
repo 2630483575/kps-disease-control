@@ -4,32 +4,21 @@ import type { MenuProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
 import AddRole from "./AddRole";
-
-type MenuItem = Required<MenuProps>["items"][number];
-const items: MenuItem[] = [
-  {
-    key: "sub1",
-    label: "系统管理员",
-  },
-  {
-    key: "sub2",
-    label: "审计管理员",
-  },
-];
-export default function RoleMenu() {
-  const addModalClassNames = {
-    header: styles["add-modal-header"],
-    content: styles["add-modal-content"],
-  };
+import { leftRoleMenu } from "@/app/types/role";
+interface roleProps {
+  menuItems: leftRoleMenu[];
+}
+const addModalClassNames = {
+  header: styles["add-modal-header"],
+  content: styles["add-modal-content"],
+};
+export default function RoleMenu({ menuItems }: roleProps) {
   const onClick: MenuProps["onClick"] = (e) => {
     console.log("click ", e);
   };
   const [isAddRoleModalOpen, setIsAddRoleModalOpen] = useState(false);
   const showAddRoleModal = () => {
     setIsAddRoleModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsAddRoleModalOpen(false);
   };
 
   const handleCancel = () => {
@@ -43,15 +32,13 @@ export default function RoleMenu() {
       <Menu
         onClick={onClick}
         className="w-full h-full"
-        defaultSelectedKeys={["1"]}
-        defaultOpenKeys={["sub1"]}
         mode="inline"
-        items={items}
+        items={menuItems}
       />
       <Modal
         title="添加角色"
         open={isAddRoleModalOpen}
-        onOk={handleOk}
+        footer={null}
         onCancel={handleCancel}
         width={600}
         classNames={addModalClassNames}

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Input, Button, Space, Table, Modal } from "antd";
+import { Input, Button, Space, Table, Modal, message } from "antd";
 import type { GetProps, TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
@@ -22,7 +22,6 @@ interface PaginationState extends TablePaginationConfig {
   pageSize: number;
   total: number;
 }
-// 列的定义
 
 export default function LabelInfo() {
   const columns: TableProps<tagDataType>["columns"] = [
@@ -43,8 +42,8 @@ export default function LabelInfo() {
     },
     {
       title: "编号",
-      dataIndex: "categoryId",
-      key: "categoryId",
+      dataIndex: "tagId",
+      key: "tagId",
     },
     {
       title: "操作",
@@ -63,6 +62,7 @@ export default function LabelInfo() {
       ),
     },
   ];
+  const [messageApi, contextHolder] = message.useMessage();
   const [isAddTagModalOpen, setIsAddTagModalOpen] = useState(false);
   const dictLeftSelected = useDictLeftMenuStore(
     (state) => state.dictLeftSelected
@@ -99,11 +99,11 @@ export default function LabelInfo() {
           });
           let data = res.data.userList;
           let tableData = data.map((opt: tagDataType) => ({
-            id: opt.id,
-            categoryId: opt.categoryId,
+            id: opt.index,
             tagName: opt.tagName,
             updateTime: opt.updateTime,
             tagId: opt.tagId,
+            rank: opt.rank,
           }));
           setTableData(tableData);
         }
@@ -127,7 +127,15 @@ export default function LabelInfo() {
             pageSize: res.data.pageSize,
             total: res.data.total,
           });
-          setTableData(res.data);
+          let data = res.data.userList;
+          let tableData = data.map((opt: tagDataType) => ({
+            id: opt.index,
+            tagName: opt.tagName,
+            updateTime: opt.updateTime,
+            tagId: opt.tagId,
+            rank: opt.rank,
+          }));
+          setTableData(tableData);
           setTagName("");
         }
       });
@@ -143,6 +151,7 @@ export default function LabelInfo() {
   };
   const handleCancel = () => {
     setIsAddTagModalOpen(false);
+    getTagList();
   };
   const handleCloseDelModal = () => {
     setIsShowDelModal(false);
@@ -155,7 +164,10 @@ export default function LabelInfo() {
     fetchApi.post("/cdc/tag/deleteTagById", { tagId: delTagId }).then((res) => {
       if (res.code === 200) {
         setIsShowDelModal(false);
+        messageApi.success(res.msg);
         getTagList();
+      } else {
+        messageApi.error(res.msg);
       }
     });
   };

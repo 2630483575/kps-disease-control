@@ -6,10 +6,9 @@ import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
 import { useUserLeftMenuStore } from "@/app/store/useUserStore";
 import AddUser from "./AddUser";
-import { DataType, userResType } from "@/app/types/user";
+import { DataType, roleDataType, userResType } from "@/app/types/user";
 import fetchApi from "@/lib/fetchApi";
 import type { TablePaginationConfig } from "antd/es/table";
-import { roleDataType } from "@/app/types/role";
 import { optionType } from "@/app/types/select";
 import ResetPassword from "./ResetPassword";
 

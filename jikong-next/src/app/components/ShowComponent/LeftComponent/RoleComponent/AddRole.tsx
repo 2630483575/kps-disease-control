@@ -37,11 +37,7 @@ export default function AddRole() {
           label="排序"
           rules={[{ required: true, message: "请选择排序" }]}
         >
-          <InputNumber
-            defaultValue={1}
-            onChange={onChange}
-            style={{ width: "100%" }}
-          />
+          <InputNumber onChange={onChange} style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item<FieldType> name="status" label="状态">
           <Radio.Group>

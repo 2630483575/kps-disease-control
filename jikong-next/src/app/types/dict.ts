@@ -17,10 +17,10 @@ export type IDictListData = {
 };
 // 标签列表数据类型
 export type tagDataType = {
-  id?: number;
+  index?: number;
   tagName?: string;
   updateTime?: string;
-  categoryId?: string;
+  rank?: number;
   tagId?: number;
 };
 // 标签列表返回数据
@@ -28,6 +28,6 @@ export type tagResType = {
   id?: number;
   tagName?: string;
   updateTime?: string;
-  categoryId?: string;
   tagId?: number;
+  rank?: number;
 };

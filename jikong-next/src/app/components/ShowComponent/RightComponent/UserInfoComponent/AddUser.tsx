@@ -1,4 +1,3 @@
-import { roleDataType } from "@/app/types/role";
 import { DataType } from "@/app/types/user";
 import fetchApi from "@/lib/fetchApi";
 import { Form, Input, Select, Radio, Button, message } from "antd";
