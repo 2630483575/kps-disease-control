@@ -298,7 +298,7 @@ export default function UserInfo() {
         />
       </div>
       <Modal
-        title="添加用户"
+        title={`${modalMode === "add" ? "添加" : "编辑"}用户`}
         open={isAddUserModalOpen}
         footer={null}
         onCancel={handleCancel}

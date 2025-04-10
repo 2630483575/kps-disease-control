@@ -1,6 +1,6 @@
 "use client";
-import UserManage from "./UserManage/page";
+import UserManage from "./User/page";
 import { redirect } from "next/navigation";
 export default function SystemManage() {
-  redirect("/SystemManage/UserManage");
+  redirect("/System/Dict");
 }

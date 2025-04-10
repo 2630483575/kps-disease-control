@@ -16,7 +16,7 @@ export default function Login() {
       if (res.code === 200) {
         sessionStorage.setItem("tokenName", res.data.tokenInfo.tokenName);
         sessionStorage.setItem("tokenValue", res.data.tokenInfo.tokenValue);
-        router.push("/SystemManage");
+        router.push("/System");
       } else {
         messageApi.open({
           type: "error",

@@ -1,9 +1,9 @@
 "use client";
 // 基本没用了这个
 // 整个大的内容页面 根据左边选择展示不同组件
-import UserManage from "@/app/SystemManage/UserManage/page";
-import DictManage from "@/app/SystemManage/DictManage/page";
-import PermissionManage from "@/app/SystemManage/PermissionManage/page";
+import UserManage from "@/app/(commonLayout)/System/User/page";
+import DictManage from "@/app/(commonLayout)/System/Dict/page";
+import PermissionManage from "@/app/(commonLayout)/System/Perm/page";
 import { useSideStore } from "@/app/store/useSideStore";
 export default function ShowComponent() {
   const activeSideMenu = useSideStore((state) => state.sideSelected);

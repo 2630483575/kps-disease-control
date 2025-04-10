@@ -8,13 +8,13 @@ import { useRouter } from "next/navigation";
 type MenuItem = Required<MenuProps>["items"][number];
 const items: MenuItem[] = [
   {
-    key: "systemManage",
+    key: "System",
     label: "系统管理",
     icon: <DesktopOutlined />,
     children: [
-      { key: "UserManage", label: "用户管理" },
-      { key: "DictManage", label: "字典维护" },
-      { key: "PermissionManage", label: "权限管理" },
+      { key: "User", label: "用户管理" },
+      { key: "Dict", label: "字典维护" },
+      { key: "Perm", label: "权限管理" },
     ],
   },
 ];
@@ -22,7 +22,7 @@ export default function Side() {
   const router = useRouter();
   const onClick: MenuProps["onClick"] = (e) => {
     setActiveSideMenu(e.key);
-    router.push(`/SystemManage/${e.key}`);
+    router.push(`/System/${e.key}`);
   };
   const setActiveSideMenu = useSideStore((state) => state.setSideSelected);
   return (
@@ -30,8 +30,8 @@ export default function Side() {
       <Menu
         onClick={onClick}
         className="w-full h-full"
-        defaultSelectedKeys={["UserManage"]}
-        defaultOpenKeys={["systemManage"]}
+        defaultSelectedKeys={["Dict"]}
+        defaultOpenKeys={["System"]}
         mode="inline"
         items={items}
       />
