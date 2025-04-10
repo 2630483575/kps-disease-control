@@ -12,9 +12,8 @@ export default function DepMenu(props: { menuItems: leftDepMenu[] }) {
     (state) => state.setUserLeftGroupSelected
   );
   const onClick: MenuProps["onClick"] = (e) => {
-    console.log(e);
-    setUserLeftGroupSelected(Number(e.keyPath[1]));
-    setUserLeftSelected(Number(e.key));
+    setUserLeftGroupSelected(Number(e.key));
+    setUserLeftSelected(Number(e.keyPath[1]));
   };
 
   return (

@@ -11,10 +11,12 @@ import fetchApi from "@/lib/fetchApi";
 import type { TablePaginationConfig } from "antd/es/table";
 import { roleDataType } from "@/app/types/role";
 import { optionType } from "@/app/types/select";
+import ResetPassword from "./ResetPassword";
 
 interface PaginationState extends TablePaginationConfig {
   current: number;
   pageSize: number;
+  total: number;
 }
 
 type SearchProps = GetProps<typeof Input.Search>;
@@ -78,8 +80,8 @@ export default function UserInfo() {
       render: (_, record) => (
         <Space size="middle">
           <a onClick={() => handleUserEdit(record)}>编辑</a>
-          <a onClick={resetPassword}>重置密码</a>
-          <a onClick={deleteUser}>删除</a>
+          <a onClick={() => resetPassword(record)}>重置密码</a>
+          <a onClick={() => deleteUser(record)}>删除</a>
         </Space>
       ),
     },
@@ -90,21 +92,26 @@ export default function UserInfo() {
   const [allRoleInfo, setAllRoleInfo] = useState<optionType[]>([]);
   const [modalMode, setModalMode] = useState("add");
   const [editData, setEditData] = useState<DataType>({});
+  const [isShowPasswordModal, setIsShowPasswordModal] = useState(false);
+  const [isShowDelModal, setIsShowDelModal] = useState(false);
+  const [delUserId, setDelUserId] = useState(0);
   const [pagination, setPagination] = useState<PaginationState>({
     current: 1,
     pageSize: 10,
+    total: 0,
   });
-  const userLeftSelected = useUserLeftMenuStore(
-    (state) => state.userLeftSelected
+  const groupSelected = useUserLeftMenuStore(
+    (state) => state.userLeftGroupSelected
   );
+  // 获取用户列表
   const getUserList = (page = 1, pageSize = 10) => {
     fetchApi
       .post("/system/user/selectUsers", {
         phoneNumber: phoneNumber,
-        deptId: userLeftSelected,
+        deptId: groupSelected,
         username: username,
-        pageNo: pagination.current,
-        pageSize: pagination.pageSize,
+        pageNo: page ?? pagination.current,
+        pageSize: pageSize ?? pagination.pageSize,
         orderBy: "user_id",
       })
       .then((res) => {
@@ -112,21 +119,23 @@ export default function UserInfo() {
           setPagination({
             current: res.data.currentPage,
             pageSize: res.data.pageSize,
+            total: res.data.total,
           });
           const allUsers = res.data.userList;
-          allUsers.map((user: userResType) => {
+          const newAllCoulumUser = allUsers.map((user: userResType) => {
             let roleName = user.roleNames?.join() ?? "";
             return { ...user, roleName: roleName };
           });
-          setTableData(allUsers);
+          setTableData(newAllCoulumUser);
         }
       });
   };
+  // 重置
   const reset = () => {
     fetchApi
       .post("/system/user/selectUsers", {
         phoneNumber: "",
-        deptId: userLeftSelected,
+        deptId: groupSelected,
         username: "",
         pageNo: 1,
         pageSize: 10,
@@ -137,25 +146,30 @@ export default function UserInfo() {
           setPagination({
             current: res.data.currentPage,
             pageSize: res.data.pageSize,
+            total: res.data.total,
           });
-          const allUsers = res.data.userList;
-          allUsers.map((user: userResType) => {
-            let roleName = user.roleNames?.join() ?? "";
+          const allUsers = JSON.parse(JSON.stringify(res.data.userList));
+
+          const newAllCoulumUser = allUsers.map((user: userResType) => {
+            const roleName = user.roleNames.concat() ?? "";
             return { ...user, roleName: roleName };
           });
-          setTableData(allUsers);
+
+          setTableData(newAllCoulumUser);
+          setUserName("");
+          setPhoneNumber("");
         }
       });
   };
   // 左边选中的menuItem改变就重新获取数据
   useEffect(() => {
     getUserList();
-  }, [userLeftSelected]);
+  }, [groupSelected]);
   const handleTableChange = (newPagination: TablePaginationConfig) => {
     getUserList(newPagination.current, newPagination.pageSize);
   };
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
-  const showAddUserModal = () => {
+  const showAddModal = () => {
     fetchApi.get("/system/role/listRoleAll").then((res) => {
       if (res.code === 200) {
         const allData = JSON.parse(JSON.stringify(res.data));
@@ -171,14 +185,47 @@ export default function UserInfo() {
   };
   const handleCancel = () => {
     setIsAddUserModalOpen(false);
+    getUserList();
+  };
+  const handleUserAdd = () => {
+    setModalMode("add");
+    showAddModal();
   };
   const handleUserEdit = (record: DataType) => {
-    setIsAddUserModalOpen(true);
     setModalMode("edit");
     setEditData(record);
+    showAddModal();
   };
-  const resetPassword = () => {};
-  const deleteUser = () => {};
+  const handleCloseModal = () => {
+    setIsAddUserModalOpen(false);
+    setEditData({});
+    getUserList();
+  };
+  const resetPassword = (record: DataType) => {
+    setEditData(record);
+    setIsShowPasswordModal(true);
+  };
+  const handleClosePasswordModal = () => {
+    setIsShowPasswordModal(false);
+    getUserList();
+  };
+  const handleCloseDelModal = () => {
+    setIsShowDelModal(false);
+  };
+  const deleteUser = (record: DataType) => {
+    setDelUserId(record.userId ?? 0);
+    setIsShowDelModal(true);
+  };
+  const delUser = () => {
+    fetchApi
+      .post("/system/user/deleteUserById", { userId: delUserId })
+      .then((res) => {
+        if (res.code === 200) {
+          setIsShowDelModal(false);
+          getUserList();
+        }
+      });
+  };
 
   return (
     <>
@@ -187,6 +234,7 @@ export default function UserInfo() {
           <Input
             placeholder="请输入手机号"
             size="large"
+            value={phoneNumber}
             onChange={(e) => {
               setPhoneNumber(e.target.value);
             }}
@@ -196,6 +244,7 @@ export default function UserInfo() {
         <div className="w-[300px]">
           <Input
             placeholder="请输入用户姓名"
+            value={username}
             size="large"
             onChange={(e) => {
               setUserName(e.target.value);
@@ -232,7 +281,7 @@ export default function UserInfo() {
             type="primary"
             size="large"
             icon={<PlusOutlined />}
-            onClick={showAddUserModal}
+            onClick={handleUserAdd}
           >
             添加用户
           </Button>
@@ -257,11 +306,34 @@ export default function UserInfo() {
         classNames={addModalClassNames}
       >
         <AddUser
-          closeModal={() => setIsAddUserModalOpen(false)}
+          closeModal={handleCloseModal}
           roleList={allRoleInfo}
           mode={modalMode}
           editData={editData}
         />
+      </Modal>
+      <Modal
+        title="重置密码"
+        open={isShowPasswordModal}
+        footer={null}
+        onCancel={handleClosePasswordModal}
+        width={600}
+        classNames={addModalClassNames}
+      >
+        <ResetPassword
+          closeModal={handleClosePasswordModal}
+          editData={editData}
+        />
+      </Modal>
+      <Modal
+        title="删除用户"
+        open={isShowDelModal}
+        onCancel={handleCloseDelModal}
+        onOk={delUser}
+        width={600}
+        classNames={addModalClassNames}
+      >
+        确定要删除该用户么?
       </Modal>
     </>
   );

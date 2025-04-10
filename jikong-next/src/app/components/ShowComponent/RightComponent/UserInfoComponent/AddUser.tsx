@@ -4,7 +4,7 @@ import fetchApi from "@/lib/fetchApi";
 import { Form, Input, Select, Radio, Button, message } from "antd";
 import type { FormProps } from "antd";
 import { useUserLeftMenuStore } from "@/app/store/useUserStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { optionType } from "@/app/types/select";
 type FieldType = {
   group?: string;
@@ -33,15 +33,30 @@ export default function AddUser({
   mode,
   editData,
 }: AddUserProps) {
+  const [messageApi, contextHolder] = message.useMessage();
+  const resetSuccess = (msg: string) => {
+    messageApi.open({
+      type: "success",
+      content: msg,
+    });
+  };
+  const resetError = (msg: string) => {
+    messageApi.open({
+      type: "error",
+      content: msg,
+    });
+  };
   const depMenu = useUserLeftMenuStore((state) => state.userLeftMenu);
   const groupSelected = useUserLeftMenuStore((state) => state.userLeftSelected);
   const deptSelected = useUserLeftMenuStore(
     (state) => state.userLeftGroupSelected
   );
+  const [form] = Form.useForm();
   const leftList: optionType[] = depMenu.map((opt) => ({
     value: opt.key,
     label: opt.label,
   }));
+
   const [groupList, setGroupList] = useState<optionType[]>(leftList);
 
   const [depList, setDepList] = useState<optionType[]>([]);
@@ -54,51 +69,92 @@ export default function AddUser({
     }));
     setDepList(rightList);
   };
-  const setInitialEditData = () => {
-    const roleId = roleList.find(
-      (item) => item.label === editData.roleName
-    )?.value;
-    return {
-      group: groupSelected,
-      deptId: deptSelected,
-      userName: editData.userName,
-      phoneNumber: editData.phoneNumber,
-      email: editData.email,
-      role: roleId,
-      sex: editData.sex,
-      password: editData.password,
-      status: editData.status,
-      remark: editData.remark,
-    };
-  };
+  useEffect(() => {
+    if (mode === "edit") {
+      const roleId = roleList.find(
+        (item) => item.label === editData.roleName
+      )?.value;
+      const depList =
+        depMenu
+          .find((item) => item.key === groupSelected)
+          ?.children.map((opt) => ({
+            value: opt.key,
+            label: opt.label,
+          })) ?? [];
+      const initData = {
+        group: groupSelected,
+        depId: deptSelected,
+        userName: editData.userName,
+        phoneNumber: editData.phoneNumber,
+        email: editData.email,
+        role: roleId,
+        sex: String(editData.sex),
+        password: editData.password ?? "",
+        status: String(editData.status),
+        remark: editData.remark ?? "",
+      };
+
+      setDepList(depList);
+      form.setFieldsValue(initData);
+    } else {
+      form.resetFields();
+    }
+  }, [mode, editData]);
+
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    fetchApi
-      .post("/system/user/insertUser", {
-        deptId: values.depId,
-        password: values.password,
-        email: values.email,
-        phoneNumber: values.phoneNumber,
-        remark: values.remark,
-        roleIds: [values.role],
-        sex: Number(values.sex),
-        status: Number(values.status),
-        userName: values.userName,
-      })
-      .then((res) => {
-        if (res.code === 200) {
-          message.success(res.msg);
-        }
-      });
-    closeModal();
+    if (mode === "add") {
+      fetchApi
+        .post("/system/user/insertUser", {
+          deptId: values.depId,
+          password: values.password,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          remark: values.remark,
+          roleIds: [values.role],
+          sex: Number(values.sex),
+          status: Number(values.status),
+          userName: values.userName,
+        })
+        .then((res) => {
+          if (res.code === 200) {
+            closeModal();
+            resetSuccess(res.msg);
+          } else {
+            resetError(res.msg);
+          }
+        });
+    } else
+      fetchApi
+        .post("/system/user/updateUser", {
+          deptId: values.depId,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          remark: values.remark,
+          roleIds: [values.role],
+          sex: Number(values.sex),
+          status: Number(values.status),
+          userName: values.userName,
+          userId: editData.userId,
+        })
+        .then((res) => {
+          if (res.code === 200) {
+            closeModal();
+            resetSuccess(res.msg);
+          } else {
+            resetError(res.msg);
+          }
+        });
   };
   return (
     <>
+      {contextHolder}
       <Form
         labelCol={{ span: 12 }}
         wrapperCol={{ span: 24 }}
         layout="inline"
         style={{ maxWidth: 600, marginTop: "20px" }}
         onFinish={onFinish}
+        form={form}
       >
         <div className="flex flex-wrap w-full">
           <div className="flex-1">
@@ -160,14 +216,16 @@ export default function AddUser({
             </Form.Item>
           </div>
           <div className="flex-1">
-            <Form.Item<FieldType>
-              label="用户密码"
-              layout="vertical"
-              name="password"
-              rules={[{ required: true, message: "请输入用户密码" }]}
-            >
-              <Input placeholder="请输入用户密码" />
-            </Form.Item>
+            {mode === "add" && (
+              <Form.Item<FieldType>
+                label="用户密码"
+                layout="vertical"
+                name="password"
+                rules={[{ required: true, message: "请输入用户密码" }]}
+              >
+                <Input placeholder="请输入用户密码" />
+              </Form.Item>
+            )}
           </div>
         </div>
         <div className="w-full mt-[10px]">

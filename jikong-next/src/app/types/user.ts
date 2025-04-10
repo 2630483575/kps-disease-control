@@ -9,18 +9,20 @@ export type DataType = {
   sex?: number;
   password?: string;
   remark?: string;
+  userId?: number;
 };
 export type userResType = {
   id?: number;
   userName?: string;
   phoneNumber?: string;
   email?: string;
-  roleNames?: string[];
+  roleNames: string[];
   createTime?: string;
   status?: number;
   sex?: number;
   password?: string;
   remark?: string;
+  userId?: number;
 };
 export type userByDept = {
   depId: number;
