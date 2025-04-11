@@ -13,4 +13,5 @@ export type treeSingleType = {
   title: string;
   key: string;
   children: treeSingleType[];
+  disabled?: boolean;
 };

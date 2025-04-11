@@ -56,11 +56,17 @@ export default function RoleComponent() {
   return (
     <>
       {contextHolder}
-      <div className="w-full h-100px">
-        <Search placeholder="请输入部门名称" onSearch={onSearch} size="large" />
-      </div>
-      <div className="flex-1 w-full">
-        <RoleMenu menuItems={leftRoleMenu} getRoleList={getRoleList} />
+      <div className="overflow-auto">
+        <div className="w-full h-100px">
+          <Search
+            placeholder="请输入部门名称"
+            onSearch={onSearch}
+            size="large"
+          />
+        </div>
+        <div className="flex-1 w-full">
+          <RoleMenu menuItems={leftRoleMenu} getRoleList={getRoleList} />
+        </div>
       </div>
     </>
   );

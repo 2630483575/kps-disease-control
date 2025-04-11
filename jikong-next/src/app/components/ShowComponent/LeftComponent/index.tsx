@@ -4,7 +4,7 @@ import FileBusiComponent from "./FileBusiComponent";
 import RoleComponent from "./RoleComponent";
 export default function LeftComponent(props: any) {
   return (
-    <div className="w-[300px] flex flex-col p-[16px] gap-4 border-r-[1px] border-slate-300">
+    <div className="w-[300px] flex flex-col p-[16px] gap-4 border-r-[1px] border-slate-300 overflow-hidden">
       {props.type === "UserManage" && <DepComponent />}
       {props.type === "tagManage" && <FileBusiComponent />}
       {props.type === "PermissionManage" && <RoleComponent />}

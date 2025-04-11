@@ -56,6 +56,7 @@ const treeData: TreeDataNode[] = [
 export default function MenuPermission() {
   const [messageApi, contextHolder] = message.useMessage();
   const tabSelected = useRoleLeftMenuStore((state) => state.tabSelected);
+  const [menuPermissionList, setMenuPermissionList] = useState([]);
   const [treeData, setTreeData] = useState<treeSingleType[]>([]);
   const roleLeftSelected = useRoleLeftMenuStore(
     (state) => state.roleLeftSelected
@@ -66,7 +67,12 @@ export default function MenuPermission() {
         .get("/system/menu/select", { roleId: roleLeftSelected })
         .then((res) => {
           if (res.code === 200) {
-            const initPernmissionData = generateKeys(res.data);
+            setMenuPermissionList(res.menuList);
+            const defaultKeysArray: string[] = [];
+            const initPernmissionData = generateKeys(res.menuList, "0");
+            console.log(initPernmissionData);
+
+            setTreeData(initPernmissionData.treeData);
           } else {
             messageApi.error(res.msg);
           }

@@ -1,24 +1,31 @@
 // 根据接口数据转换成tree展示的数据格式generateKeys(data,'0')
 export const generateKeys: Function = (items: any[], parentKey: string) => {
-  let keysArray = [];
-  return items.map((item, index) => {
-    const key = parentKey ? `${parentKey}-${index}` : `${index}`;
-    if (item.isSelected === 1) {
-      keysArray.push(key);
-    }
-    let children = null;
+  let defaultKeysArray: string[] = [];
+  const generate = (items: any[], parentKey: string): any[] => {
+    return items.length === 0
+      ? []
+      : items.map((item, index) => {
+          const key = parentKey ? `${parentKey}-${index}` : `${index}`;
+          if (item.isSelected === 1) {
+            defaultKeysArray.push(key);
+          }
+          let children = null;
 
-    if (item.children) {
-      children = generateKeys(item.children, key);
-    }
-    return {
-      title: item.label,
-      disabled: item.isSelected === -1 ? true : false,
-      key: key,
-      children: children,
-    };
-  });
+          if (item.children && item.children.length > 0) {
+            children = generate(item.children, key);
+          }
+          return {
+            title: item.menuName,
+            disabled: item.isSelected === -1 ? true : false,
+            key: key,
+            children: children,
+          };
+        });
+  };
+  const treeData = generate(items, parentKey);
+  return { treeData, defaultKeysArray };
 };
+
 // 根据tree展示调用接口 mapKeysArrayToOriginalData(["0-0"], data);
 export const mapKeysArrayToOriginalData = (keysArray: string[], items: any) => {
   for (const key of keysArray) {
