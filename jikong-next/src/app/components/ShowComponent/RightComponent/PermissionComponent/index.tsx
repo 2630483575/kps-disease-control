@@ -5,34 +5,35 @@ import RoleInfo from "./RoleInfo";
 import MenuPermission from "./MenuPermission";
 import DataPermission from "./DataPermission";
 import RelatedUser from "./RelatedUser";
-
-const onChange = (key: string) => {
-  console.log(key);
-};
+import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
 
 const tabItems: TabsProps["items"] = [
   {
-    key: "1",
+    key: "roleInfo",
     label: "角色信息",
     children: <RoleInfo />,
   },
   {
-    key: "2",
+    key: "menuPermission",
     label: "菜单权限",
     children: <MenuPermission />,
   },
   {
-    key: "3",
+    key: "dataPermission",
     label: "数据权限",
     children: <DataPermission />,
   },
   {
-    key: "4",
+    key: "relatedUser",
     label: "关联用户",
     children: <RelatedUser />,
   },
 ];
 export default function PermissionComponent() {
+  const setTabSelected = useRoleLeftMenuStore((state) => state.setTabSelected);
+  const onChange = (key: string) => {
+    setTabSelected(key);
+  };
   return (
     <Tabs
       defaultActiveKey="1"

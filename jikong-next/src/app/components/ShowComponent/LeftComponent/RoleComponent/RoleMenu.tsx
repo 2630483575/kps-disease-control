@@ -5,16 +5,21 @@ import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
 import AddRole from "./AddRole";
 import { leftRoleMenu } from "@/app/types/role";
+import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
 interface roleProps {
   menuItems: leftRoleMenu[];
+  getRoleList: (depName: string) => void;
 }
 const addModalClassNames = {
   header: styles["add-modal-header"],
   content: styles["add-modal-content"],
 };
-export default function RoleMenu({ menuItems }: roleProps) {
+export default function RoleMenu({ menuItems, getRoleList }: roleProps) {
+  const setRoleLeftSelected = useRoleLeftMenuStore(
+    (state) => state.setRoleLeftSelected
+  );
   const onClick: MenuProps["onClick"] = (e) => {
-    console.log("click ", e);
+    setRoleLeftSelected(Number(e.key));
   };
   const [isAddRoleModalOpen, setIsAddRoleModalOpen] = useState(false);
   const showAddRoleModal = () => {
@@ -23,6 +28,10 @@ export default function RoleMenu({ menuItems }: roleProps) {
 
   const handleCancel = () => {
     setIsAddRoleModalOpen(false);
+  };
+  const handleCloseModal = () => {
+    setIsAddRoleModalOpen(false);
+    getRoleList("");
   };
   return (
     <>
@@ -43,7 +52,7 @@ export default function RoleMenu({ menuItems }: roleProps) {
         width={600}
         classNames={addModalClassNames}
       >
-        <AddRole />
+        <AddRole closeModal={handleCloseModal} cancelModal={handleCancel} />
       </Modal>
     </>
   );

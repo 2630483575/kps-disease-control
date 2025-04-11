@@ -59,6 +59,7 @@ export default function AddTag({ mode, closeModal, editData }: dictProps) {
         .then((res) => {
           if (res.code === 200) {
             messageApi.success(res.msg);
+            closeModal();
           } else {
             messageApi.error(res.msg);
           }
