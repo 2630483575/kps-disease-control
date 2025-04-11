@@ -15,3 +15,11 @@ export type treeSingleType = {
   children: treeSingleType[];
   disabled?: boolean;
 };
+export type relatedUserType = {
+  key: number;
+  userName: string;
+  phone: string;
+  email: string;
+  relatedTime: string;
+  status: number;
+};

@@ -1,28 +1,28 @@
 "use client";
-import React, { useState } from "react";
-import { Input, Button, Space, Table, Modal, Tag } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, Space, Table, Modal, Tag, message } from "antd";
 import type { GetProps, TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import styles from "./index.module.css";
 import AddRelatedUser from "./AddRelatedUser";
+import { relatedUserType } from "@/app/types/role";
+import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
+import type { TablePaginationConfig } from "antd/es/table";
+import fetchApi from "@/lib/fetchApi";
 
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search } = Input;
+const addModalClassNames = {
+  header: styles["add-modal-header"],
+  content: styles["add-modal-content"],
+};
 
-interface DataType {
-  key: number;
-  userName: string;
-  phone: string;
-  email: string;
-  relatedTime: string;
-  status: number;
-}
 // 列的定义
-const columns: TableProps<DataType>["columns"] = [
+const columns: TableProps<relatedUserType>["columns"] = [
   {
     title: "序号",
-    dataIndex: "key",
-    key: "key",
+    dataIndex: "id",
+    key: "id",
   },
   {
     title: "用户名称",
@@ -31,8 +31,8 @@ const columns: TableProps<DataType>["columns"] = [
   },
   {
     title: "手机号",
-    dataIndex: "phone",
-    key: "phone",
+    dataIndex: "phoneNumber",
+    key: "phoneNumber",
   },
   {
     title: "邮箱",
@@ -59,25 +59,48 @@ const columns: TableProps<DataType>["columns"] = [
     },
   },
 ];
-// table的数据
-const data = Array.from({ length: 100 }).map<DataType>((_, i) => ({
-  key: i + 1,
-  userName: "irelia",
-  phone: "16677788888",
-  email: "idydjusys@163.com",
-  relatedTime: "2024-9-5 11:12:36",
-  status: 0,
-}));
-
+interface PaginationState extends TablePaginationConfig {
+  current: number;
+  pageSize: number;
+  total: number;
+}
 export default function RelatedUser() {
-  const addModalClassNames = {
-    header: styles["add-modal-header"],
-    content: styles["add-modal-content"],
-  };
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [tableData, setTableData] = useState<relatedUserType[]>([]);
+  const tabSelected = useRoleLeftMenuStore((state) => state.tabSelected);
+  const [pagination, setPagination] = useState<PaginationState>({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+  const [messageApi, contextHolder] = message.useMessage();
+  const roleLeftSelected = useRoleLeftMenuStore(
+    (state) => state.roleLeftSelected
+  );
+  const getRelatedUserList = (page = 1, pageSize = 10) => {
+    fetchApi
+      .post("/system/user/selectUsersByRoleId", {
+        id: roleLeftSelected,
+        pageNo: page ?? pagination.current,
+        pageSize: pageSize ?? pagination.pageSize,
+      })
+      .then((res) => {
+        if (res.code === 200) {
+          setTableData(res.data.userList);
+        } else {
+          messageApi.error(res.msg);
+        }
+      });
+  };
+  const handleTableChange = (newPagination: TablePaginationConfig) => {};
   const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
     console.log(info?.source, value);
   };
+  useEffect(() => {
+    if (roleLeftSelected && tabSelected === "relatedUser") {
+      getRelatedUserList();
+    }
+  }, [roleLeftSelected]);
   const showAddUserModal = () => {
     setIsAddUserModalOpen(true);
   };
@@ -111,10 +134,12 @@ export default function RelatedUser() {
         </div>
       </div>
       <div className="flex-1 h-full overflow-auto">
-        <Table<DataType>
+        <Table<relatedUserType>
           columns={columns}
-          dataSource={data}
+          dataSource={tableData}
           className="h-full"
+          rowKey={"id"}
+          onChange={handleTableChange}
         />
       </div>
       <Modal

@@ -5,12 +5,15 @@ import { Button, Form, Input, message } from "antd";
 import { useRouter } from "next/navigation";
 import fetchApi from "@/lib/fetchApi";
 import { useLoginUserStore } from "@/app/store/useLoginStore";
+import { convertSideMenu } from "@/app/utils/sideData";
+import { useSideStore } from "@/app/store/useSideStore";
 
 type logType = { username: string; password: string };
 
 export default function Login() {
   const setLoginUserInfo = useLoginUserStore((state) => state.setLoginUserInfo);
   const [messageApi, contextHolder] = message.useMessage();
+  const setSideMenu = useSideStore((state) => state.setSideMenu);
   // const setUserToken = useUserTokenStore((state) => state.setUserToken);
   const router = useRouter();
   const userLogin = async (logInfo: logType) => {
@@ -18,6 +21,9 @@ export default function Login() {
       if (res.code === 200) {
         sessionStorage.setItem("tokenName", res.data.tokenInfo.tokenName);
         sessionStorage.setItem("tokenValue", res.data.tokenInfo.tokenValue);
+        const menuList = convertSideMenu(res.data.menus);
+
+        setSideMenu(menuList);
         setLoginUserInfo({ ...logInfo, loginId: res.data.tokenInfo.loginId });
         router.push("/System");
       } else {
