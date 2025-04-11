@@ -13,12 +13,9 @@ type logType = { username: string; password: string };
 
 export default function Login() {
   const setLoginUserInfo = useLoginUserStore((state) => state.setLoginUserInfo);
-  const setUserCanEditRole = useRoleLeftMenuStore(
-    (state) => state.setCanEditRoleList
-  );
   const [messageApi, contextHolder] = message.useMessage();
-  const setSideMenu = useSideStore((state) => state.setSideMenu);
   // const setUserToken = useUserTokenStore((state) => state.setUserToken);
+  const setSideMenu = useSideStore((state) => state.setSideMenu);
   const router = useRouter();
   const userLogin = async (logInfo: logType) => {
     fetchApi.post("/login", { ...logInfo }).then((res) => {
@@ -26,8 +23,8 @@ export default function Login() {
         sessionStorage.setItem("tokenName", res.data.tokenInfo.tokenName);
         sessionStorage.setItem("tokenValue", res.data.tokenInfo.tokenValue);
         const menuList = convertSideMenu(res.data.menus);
-        setUserCanEditRole(res.data.roleIds);
         setSideMenu(menuList);
+        sessionStorage.setItem("menuList", JSON.stringify(menuList));
         setLoginUserInfo({ ...logInfo, loginId: res.data.tokenInfo.loginId });
         router.push("/System");
       } else {

@@ -68,6 +68,7 @@ export default function RelatedUser() {
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [tableData, setTableData] = useState<relatedUserType[]>([]);
   const tabSelected = useRoleLeftMenuStore((state) => state.tabSelected);
+  const [userName, setUserName] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
     current: 1,
     pageSize: 10,
@@ -81,20 +82,46 @@ export default function RelatedUser() {
     fetchApi
       .post("/system/user/selectUsersByRoleId", {
         id: roleLeftSelected,
+        userName: userName,
         pageNo: page ?? pagination.current,
         pageSize: pageSize ?? pagination.pageSize,
       })
       .then((res) => {
         if (res.code === 200) {
           setTableData(res.data.userList);
+          setPagination({
+            current: res.data.currentPage,
+            pageSize: res.data.pageSize,
+            total: res.data.total,
+          });
         } else {
           messageApi.error(res.msg);
         }
       });
   };
-  const handleTableChange = (newPagination: TablePaginationConfig) => {};
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
-    console.log(info?.source, value);
+  const reset = () => {
+    fetchApi
+      .post("/system/user/selectUsersByRoleId", {
+        id: roleLeftSelected,
+        userName: "",
+        pageNo: pagination.current,
+        pageSize: pagination.pageSize,
+      })
+      .then((res) => {
+        if (res.code === 200) {
+          setTableData(res.data.userList);
+          setPagination({
+            current: res.data.currentPage,
+            pageSize: res.data.pageSize,
+            total: res.data.total,
+          });
+        } else {
+          messageApi.error(res.msg);
+        }
+      });
+  };
+  const handleTableChange = (newPagination: TablePaginationConfig) => {
+    getRelatedUserList(newPagination.current, newPagination.pageSize);
   };
   useEffect(() => {
     if (roleLeftSelected && tabSelected === "relatedUser") {
@@ -104,23 +131,48 @@ export default function RelatedUser() {
   const showAddUserModal = () => {
     setIsAddUserModalOpen(true);
   };
-  const handleOk = () => {
-    setIsAddUserModalOpen(false);
-  };
 
   const handleCancel = () => {
     setIsAddUserModalOpen(false);
   };
   return (
     <>
+      {contextHolder}
       <div className="h-[100px] flex gap-4 flex-wrap">
         <div className="w-[300px]">
-          <Search
+          <Input
             placeholder="请输入用户名称"
-            onSearch={onSearch}
             size="large"
+            value={userName}
+            onChange={(e) => {
+              setUserName(e.target.value);
+            }}
             prefix={<label>用户名称:</label>}
           />
+        </div>
+        <div>
+          <Button
+            color="blue"
+            variant="filled"
+            size="large"
+            className="w-[100px]"
+            onClick={() => {
+              getRelatedUserList();
+            }}
+          >
+            查询
+          </Button>
+        </div>
+        <div>
+          <Button
+            size="large"
+            className="w-[100px]"
+            onClick={() => {
+              reset();
+            }}
+          >
+            重置
+          </Button>
         </div>
         <div>
           <Button
@@ -145,8 +197,8 @@ export default function RelatedUser() {
       <Modal
         title="添加关联用户"
         open={isAddUserModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
+        footer={null}
         width={800}
         classNames={addModalClassNames}
       >

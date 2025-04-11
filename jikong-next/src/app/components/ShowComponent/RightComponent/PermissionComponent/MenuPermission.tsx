@@ -65,21 +65,14 @@ export default function MenuPermission() {
   );
   useEffect(() => {
     if (roleLeftSelected && tabSelected === "menuPermission") {
-      fetchApi
-        .get("/system/menu/select", { roleId: roleLeftSelected })
-        .then((res) => {
-          if (res.code === 200) {
-            const initPernmissionData = generateKeys(
-              res.menuList,
-              "0",
-              roleLeftSelected,
-              canEditRoleList
-            );
-            setTreeData(initPernmissionData.treeData);
-          } else {
-            messageApi.error(res.msg);
-          }
-        });
+      fetchApi.get("/system/menu/select", { roleId: 1 }).then((res) => {
+        if (res.code === 200) {
+          const initPernmissionData = generateKeys(res.menuList, "0");
+          setTreeData(initPernmissionData.treeData);
+        } else {
+          messageApi.error(res.msg);
+        }
+      });
     }
   }, [roleLeftSelected]);
   const onCheck: TreeProps["onCheck"] = (checkedKeys, info) => {
