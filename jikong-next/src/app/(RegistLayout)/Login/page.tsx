@@ -7,11 +7,15 @@ import fetchApi from "@/lib/fetchApi";
 import { useLoginUserStore } from "@/app/store/useLoginStore";
 import { convertSideMenu } from "@/app/utils/sideData";
 import { useSideStore } from "@/app/store/useSideStore";
+import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
 
 type logType = { username: string; password: string };
 
 export default function Login() {
   const setLoginUserInfo = useLoginUserStore((state) => state.setLoginUserInfo);
+  const setUserCanEditRole = useRoleLeftMenuStore(
+    (state) => state.setCanEditRoleList
+  );
   const [messageApi, contextHolder] = message.useMessage();
   const setSideMenu = useSideStore((state) => state.setSideMenu);
   // const setUserToken = useUserTokenStore((state) => state.setUserToken);
@@ -22,7 +26,7 @@ export default function Login() {
         sessionStorage.setItem("tokenName", res.data.tokenInfo.tokenName);
         sessionStorage.setItem("tokenValue", res.data.tokenInfo.tokenValue);
         const menuList = convertSideMenu(res.data.menus);
-
+        setUserCanEditRole(res.data.roleIds);
         setSideMenu(menuList);
         setLoginUserInfo({ ...logInfo, loginId: res.data.tokenInfo.loginId });
         router.push("/System");

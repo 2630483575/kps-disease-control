@@ -11,7 +11,7 @@ export default function Side() {
 
   const onClick: MenuProps["onClick"] = (e) => {
     setActiveSideMenu(e.key);
-    router.push(`/${e.key[1]}/${e.key}`);
+    router.push(`/${e.keyPath[1]}/${e.key}`);
   };
   const setActiveSideMenu = useSideStore((state) => state.setSideSelected);
   return (

@@ -1,5 +1,10 @@
 // 根据接口数据转换成tree展示的数据格式generateKeys(data,'0')
-export const generateKeys: Function = (items: any[], parentKey: string) => {
+export const generateKeys: Function = (
+  items: any[],
+  parentKey: string,
+  userRoleId: number,
+  editRoleList: number[]
+) => {
   let defaultKeysArray: string[] = [];
   const generate = (items: any[], parentKey: string): any[] => {
     return items.length === 0
@@ -16,7 +21,11 @@ export const generateKeys: Function = (items: any[], parentKey: string) => {
           }
           return {
             title: item.menuName,
-            disabled: item.isSelected === -1 ? true : false,
+            disabled: !editRoleList.includes(userRoleId)
+              ? false
+              : item.isSelected === -1
+              ? true
+              : false,
             key: key,
             children: children,
           };
