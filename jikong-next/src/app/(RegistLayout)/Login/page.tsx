@@ -28,10 +28,7 @@ export default function Login() {
         setLoginUserInfo({ ...logInfo, loginId: res.data.tokenInfo.loginId });
         router.push("/System");
       } else {
-        messageApi.open({
-          type: "error",
-          content: res.msg,
-        });
+        messageApi.error("登陆失败");
       }
     });
   };

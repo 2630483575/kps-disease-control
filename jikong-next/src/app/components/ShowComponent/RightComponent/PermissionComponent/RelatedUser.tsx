@@ -63,6 +63,8 @@ interface PaginationState extends TablePaginationConfig {
   current: number;
   pageSize: number;
   total: number;
+  showSizeChanger: boolean;
+  showTotal?: (total: number, range: [number, number]) => React.ReactNode;
 }
 export default function RelatedUser() {
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
@@ -73,6 +75,8 @@ export default function RelatedUser() {
     current: 1,
     pageSize: 10,
     total: 0,
+    showSizeChanger: true,
+    showTotal: (total) => `共 ${total} 条`,
   });
   const [messageApi, contextHolder] = message.useMessage();
   const roleLeftSelected = useRoleLeftMenuStore(
@@ -93,6 +97,8 @@ export default function RelatedUser() {
             current: res.data.currentPage,
             pageSize: res.data.pageSize,
             total: res.data.total,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条`,
           });
         } else {
           messageApi.error(res.msg);
@@ -114,7 +120,10 @@ export default function RelatedUser() {
             current: res.data.currentPage,
             pageSize: res.data.pageSize,
             total: res.data.total,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条`,
           });
+          setUserName("");
         } else {
           messageApi.error(res.msg);
         }
@@ -134,6 +143,11 @@ export default function RelatedUser() {
 
   const handleCancel = () => {
     setIsAddUserModalOpen(false);
+  };
+
+  const closeAddModal = () => {
+    setIsAddUserModalOpen(false);
+    getRelatedUserList();
   };
   return (
     <>
@@ -190,8 +204,9 @@ export default function RelatedUser() {
           columns={columns}
           dataSource={tableData}
           className="h-full"
-          rowKey={"id"}
+          rowKey={"userId"}
           onChange={handleTableChange}
+          pagination={pagination}
         />
       </div>
       <Modal
@@ -199,10 +214,10 @@ export default function RelatedUser() {
         open={isAddUserModalOpen}
         onCancel={handleCancel}
         footer={null}
-        width={800}
+        width={1000}
         classNames={addModalClassNames}
       >
-        <AddRelatedUser />
+        <AddRelatedUser closeModal={closeAddModal} />
       </Modal>
     </>
   );

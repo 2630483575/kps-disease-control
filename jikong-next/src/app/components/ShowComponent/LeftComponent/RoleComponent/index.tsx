@@ -22,6 +22,10 @@ const roleColumnConvert: Function = (depList: IRoleData[]) => {
 export default function RoleComponent() {
   const [messageApi, contextHolder] = message.useMessage();
   const leftRoleMenu = useRoleLeftMenuStore((state) => state.leftRoleMenu);
+  const needUpdate = useRoleLeftMenuStore((state) => state.needUpdateRoleList);
+  const setNeedUpdate = useRoleLeftMenuStore(
+    (state) => state.setNeedUpdateRoleList
+  );
   const setLeftRoleMenu = useRoleLeftMenuStore(
     (state) => state.setLeftRoleMenu
   );
@@ -53,6 +57,11 @@ export default function RoleComponent() {
   useEffect(() => {
     initRoleList();
   }, []);
+  useEffect(() => {
+    if (needUpdate) {
+      initRoleList();
+    }
+  }, [needUpdate]);
   return (
     <>
       {contextHolder}

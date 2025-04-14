@@ -1,4 +1,6 @@
-// 根据接口数据转换成tree展示的数据格式generateKeys(data,'0')
+import { IdeplistData } from "../types/dep";
+
+// 菜单权限根据接口数据转换成tree展示的数据格式generateKeys(data,'0')
 export const generateKeys: Function = (items: any[], parentKey: string) => {
   let defaultKeysArray: string[] = [];
   const generate = (items: any[], parentKey: string): any[] => {
@@ -26,7 +28,7 @@ export const generateKeys: Function = (items: any[], parentKey: string) => {
   return { treeData, defaultKeysArray };
 };
 
-// 根据tree展示调用接口 mapKeysArrayToOriginalData(["0-0"], data);
+// 菜单权限根据tree展示调用接口 mapKeysArrayToOriginalData(["0-0"], data);
 export const mapKeysArrayToOriginalData = (keysArray: string[], items: any) => {
   for (const key of keysArray) {
     let currentLevel = items;
@@ -50,4 +52,21 @@ export const mapKeysArrayToOriginalData = (keysArray: string[], items: any) => {
       currentItem.isSelected = 1;
     }
   }
+};
+
+// 用户管理部门列表根据接口返回数据转换成menu的格式
+export const depColumnConvert: Function = (depList: IdeplistData[]) => {
+  return depList.map((dep, i) => {
+    let children = null;
+
+    if (dep.children) {
+      children = depColumnConvert(dep.children);
+    }
+
+    return {
+      key: dep.id,
+      label: dep.label,
+      children: children,
+    };
+  });
 };

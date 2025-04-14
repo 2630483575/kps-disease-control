@@ -6,25 +6,10 @@ import fetchApi from "@/lib/fetchApi";
 import { useEffect } from "react";
 import { IdeplistData } from "@/app/types/dep";
 import { useUserLeftMenuStore } from "@/app/store/useUserStore";
+import { depColumnConvert } from "@/app/utils/dataToTree";
 
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search } = Input;
-// 根据接口返回数据转换成menu的格式
-const depColumnConvert: Function = (depList: IdeplistData[]) => {
-  return depList.map((dep, i) => {
-    let children = null;
-
-    if (dep.children) {
-      children = depColumnConvert(dep.children);
-    }
-
-    return {
-      key: dep.id,
-      label: dep.label,
-      children: children,
-    };
-  });
-};
 
 export default function DepComponent() {
   const userLeftMenu = useUserLeftMenuStore((state) => state.userLeftMenu);

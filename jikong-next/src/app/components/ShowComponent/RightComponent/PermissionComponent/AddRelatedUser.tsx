@@ -1,114 +1,280 @@
-import React, { useState, useEffect } from "react";
-import { Input, Menu, Switch, Transfer } from "antd";
+"use client";
+import React, { useState, useEffect, useReducer } from "react";
+import { Input, Menu, Table, List, Button, message } from "antd";
 import type { GetProps, MenuProps, TransferProps } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import type { TableColumnsType, TableProps } from "antd";
+import fetchApi from "@/lib/fetchApi";
+import { depColumnConvert } from "@/app/utils/dataToTree";
+import { leftDepMenu } from "@/app/types/dep";
+import type { TablePaginationConfig } from "antd/es/table";
+import {
+  SearchOutlined,
+  CloseOutlined,
+  MessageTwoTone,
+} from "@ant-design/icons";
+import { DataType } from "@/app/types/user";
+import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
 
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search } = Input;
+type TableRowSelection<T extends object = object> =
+  TableProps<T>["rowSelection"];
+interface PaginationState extends TablePaginationConfig {
+  current: number;
+  pageSize: number;
+  total: number;
+  showSizeChanger: boolean;
+  showTotal?: (total: number, range: [number, number]) => React.ReactNode;
+}
 
-type MenuItem = Required<MenuProps>["items"][number];
-const menuItems: MenuItem[] = [
+const tableColumns: TableColumnsType<DataType> = [
   {
-    key: "sub1",
-    label: "市控中心",
-    children: [
-      { key: "1", label: "疫情科" },
-      { key: "2", label: "疫情科" },
-      { key: "3", label: "疫情科" },
-    ],
-  },
-  {
-    key: "sub2",
-    label: "市卫建委",
-    children: [
-      { key: "4", label: "疫情科" },
-      { key: "5", label: "疫情科" },
-      { key: "6", label: "疫情科" },
-    ],
+    title: "用户名称",
+    dataIndex: "userName",
+    align: "center",
+    render: (text: string) => <a>{text}</a>,
   },
 ];
-
-interface UserInfoType {
-  key: number;
-  userName: string;
-  chosen: boolean;
+interface addProps {
+  closeModal: () => void;
 }
-export default function AddRelatedUser() {
-  const [allUserData, setAllUserData] = useState<UserInfoType[]>([]);
-  const [targetKeys, setTargetKeys] = useState<React.Key[]>([]);
-  const [oneWay, setOneWay] = useState(false);
-  useEffect(() => {
-    const newTargetKeys = [];
-    const newMockData = [];
-    for (let i = 0; i < 2000; i++) {
-      const data = {
-        key: i,
-        userName: `content${i + 1}`,
-        chosen: i % 2 === 0,
-      };
-      if (data.chosen) {
-        newTargetKeys.push(data.key);
-      }
-      newMockData.push(data);
-    }
 
-    setTargetKeys(newTargetKeys);
-    setAllUserData(newMockData);
-  }, []);
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
-    console.log(info?.source, value);
-  };
+export default function AddRelatedUser({ closeModal }: addProps) {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [userData, setUserData] = useState<DataType[]>([]);
+  const [depMenu, setDepMenu] = useState<leftDepMenu[]>([]);
+  const [activeMenu, setActiveMenu] = useState<number>(0);
+  const [depInput, setDepInput] = useState("");
+  const [userInput, setUserInput] = useState("");
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [selectedUserList, setSelectedUserList] = useState<DataType[]>([]);
+  const roleLeftSelected = useRoleLeftMenuStore(
+    (state) => state.roleLeftSelected
+  );
 
-  const onClick: MenuProps["onClick"] = (e) => {
-    console.log("click ", e);
-  };
-  const onChange: TransferProps["onChange"] = (
-    newTargetKeys,
-    direction,
-    moveKeys
+  const [userPagination, setUserPagination] = useState<PaginationState>({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    showSizeChanger: true,
+    showTotal: (total) => `共 ${total} 条`,
+  });
+  const onSelectChange = (
+    newSelectedRowKeys: React.Key[],
+    selectedRows: DataType[]
   ) => {
-    console.log(newTargetKeys, direction, moveKeys);
-    setTargetKeys(newTargetKeys);
+    setSelectedUserList(selectedRows);
+    setSelectedRowKeys(newSelectedRowKeys);
   };
+  const rowSelection: TableRowSelection<DataType> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const searchDepMenu = () => {
+    getDepMenu(depInput);
+  };
+  const searchUserMenu = () => {
+    getUserList(userInput, userPagination.current, userPagination.pageSize);
+  };
+
+  const onClickMenu: MenuProps["onClick"] = (e) => {
+    setActiveMenu(Number(e.key));
+  };
+  // 获取部门列表
+  const getDepMenu = (depName: string) => {
+    if (depName) {
+      fetchApi
+        .get("/cdc/dept/simpleTree", { deptName: depName })
+        .then((res) => {
+          if (res.code === 200) {
+            const leftDepListByName = depColumnConvert(res.data);
+            setDepMenu(leftDepListByName);
+          }
+        });
+    } else {
+      fetchApi.get("/cdc/dept/list").then((res) => {
+        if (res.code === 200) {
+          const leftColumnList = depColumnConvert(res.data);
+          setDepMenu(leftColumnList);
+        }
+      });
+    }
+  };
+  const getUserList = (
+    username: string,
+    page: number = 1,
+    pageSize: number = 10
+  ) => {
+    fetchApi
+      .post("/system/user/selectUsers", {
+        phoneNumber: "",
+        deptId: activeMenu,
+        username: username,
+        pageNo: page ?? userPagination.current,
+        pageSize: pageSize ?? userPagination.pageSize,
+        orderBy: "user_id",
+      })
+      .then((res) => {
+        setUserPagination({
+          current: res.data.currentPage,
+          pageSize: res.data.pageSize,
+          total: res.data.total,
+          showSizeChanger: true,
+          showTotal: (total) => `共 ${total} 条`,
+        });
+        setUserData(res.data.userList);
+      });
+  };
+  const handleUserTableChange = (newPagination: TablePaginationConfig) => {
+    getUserList(userInput, newPagination.current, newPagination.pageSize);
+  };
+  useEffect(() => {
+    getDepMenu("");
+  }, []);
+  useEffect(() => {
+    if (activeMenu) {
+      getUserList(userInput, userPagination.current, userPagination.pageSize);
+    }
+  }, [activeMenu]);
+  const clearAllSelectUser = () => {
+    setSelectedRowKeys([]);
+    setSelectedUserList([]);
+  };
+  const handleRemoveUser = (userId: number | undefined) => {
+    const newSelectionKeysArr = selectedRowKeys.filter(
+      (item) => item !== userId
+    );
+    const newSelectionArr = selectedUserList.filter(
+      (item) => item.userId !== userId
+    );
+    setSelectedRowKeys(newSelectionKeysArr);
+    setSelectedUserList(newSelectionArr);
+  };
+  const closeAddModal = () => {
+    clearAllSelectUser();
+    setDepInput("");
+    setUserInput("");
+    closeModal();
+  };
+  const submit = () => {
+    if (!roleLeftSelected) {
+      messageApi.error("请选择角色");
+    }
+    fetchApi
+      .post("/system/user/insertUserIdAndRoleId", {
+        roleId: roleLeftSelected,
+        userIds: selectedRowKeys,
+      })
+      .then((res) => {
+        if (res.code === 200) {
+          messageApi.success(res.msg);
+          closeModal();
+        } else {
+          messageApi.error(res.msg);
+        }
+      });
+  };
+
   return (
     <>
-      <div className="h-[50px] flex gap-4 flex-wrap ">
-        <div className="w-[320px]">
-          <Search
-            placeholder="请输入部门名称"
-            onSearch={onSearch}
-            prefix={<label>部门名称:</label>}
-          />
+      {contextHolder}
+      <div className="flex gap-4 mt-[10px] h-[800px]">
+        <div className="w-[300px] h-full border-r-[1px] border-slate-300 overflow-auto">
+          <div className="w-full flex flex-col gap-4 overflow-auto">
+            <Input
+              placeholder="请输入部门名称"
+              prefix={<label>部门名称:</label>}
+              suffix={
+                <SearchOutlined
+                  onClick={() => {
+                    searchDepMenu();
+                  }}
+                />
+              }
+              value={depInput}
+              onChange={(e) => {
+                setDepInput(e.target.value);
+              }}
+            ></Input>
+            <Menu
+              onClick={onClickMenu}
+              className="w-full flex-1"
+              mode="inline"
+              items={depMenu}
+            />
+          </div>
         </div>
-        <div className="w-[320px]">
-          <Search
-            placeholder="请输入用户名称"
-            onSearch={onSearch}
-            prefix={<label>用户名称:</label>}
-          />
+        <div className="w-[300px] h-full border-r-[1px] border-slate-300 overflow-auto">
+          <div className="w-full flex flex-col gap-4 ">
+            <Input
+              placeholder="请输入用户名称"
+              prefix={<label>用户名称:</label>}
+              suffix={
+                <SearchOutlined
+                  onClick={() => {
+                    searchUserMenu();
+                  }}
+                />
+              }
+              value={userInput}
+              onChange={(e) => {
+                setUserInput(e.target.value);
+              }}
+            ></Input>
+            <Table<DataType>
+              rowSelection={rowSelection}
+              columns={tableColumns}
+              dataSource={userData}
+              rowKey={"userId"}
+              pagination={userPagination}
+              onChange={handleUserTableChange}
+            />
+          </div>
+        </div>
+        <div className="flex-1 h-full overflow-hidden">
+          <div className="w-full flex flex-col gap-4">
+            <div className="h-[32px] flex justify-between">
+              <div>
+                <span>已选{selectedRowKeys.length}人</span>
+              </div>
+              <div>
+                <span
+                  className="cursor-pointer text-blue-500"
+                  onClick={() => {
+                    clearAllSelectUser();
+                  }}
+                >
+                  清除
+                </span>
+              </div>
+            </div>
+            <div className="flex-1 overflow-auto">
+              <List
+                pagination={{ position: "bottom", align: "end" }}
+                dataSource={selectedUserList}
+                renderItem={(item, index) => (
+                  <List.Item>
+                    <div className="flex justify-between w-full">
+                      <div>
+                        <span>{item.userName}</span>
+                      </div>
+                      <div>
+                        <CloseOutlined
+                          style={{ color: "#777777" }}
+                          onClick={() => handleRemoveUser(item.userId)}
+                        />
+                      </div>
+                    </div>
+                  </List.Item>
+                )}
+              />
+            </div>
+          </div>
         </div>
       </div>
-      <div className="flex gap-4">
-        <div className="w-200px">
-          <Menu
-            onClick={onClick}
-            className="w-full h-full"
-            defaultSelectedKeys={["1"]}
-            defaultOpenKeys={["sub1"]}
-            mode="inline"
-            items={menuItems}
-          />
-        </div>
-        <div className="flex-1 flex">
-          <Transfer
-            dataSource={allUserData}
-            targetKeys={targetKeys}
-            onChange={onChange}
-            render={(item) => item.userName}
-            oneWay={oneWay}
-            pagination
-          />
-        </div>
+      <div className="flex justify-end gap-4">
+        <Button onClick={closeAddModal}>取消</Button>
+        <Button onClick={submit}>确认</Button>
       </div>
     </>
   );

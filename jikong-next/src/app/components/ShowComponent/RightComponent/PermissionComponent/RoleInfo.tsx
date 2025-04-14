@@ -3,7 +3,7 @@ import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
 import fetchApi from "@/lib/fetchApi";
 import { Form, Input, Radio, Button, InputNumber, message } from "antd";
 import type { FormProps } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 type FieldType = {
   roleName?: string;
   roleSort?: string;
@@ -18,29 +18,48 @@ export default function RoleInfo() {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const tabSelected = useRoleLeftMenuStore((state) => state.tabSelected);
+  const setNeedUpdateRoleList = useRoleLeftMenuStore(
+    (state) => state.setNeedUpdateRoleList
+  );
   const roleLeftSelected = useRoleLeftMenuStore(
     (state) => state.roleLeftSelected
   );
+  const [loading, setLoading] = useState(true);
+  const getRoleInfo = () => {
+    fetchApi
+      .get("/system/role/getRoleById", { roleId: roleLeftSelected })
+      .then((res) => {
+        if (res.code === 200) {
+          form.setFieldsValue({ ...res.data });
+        } else {
+          messageApi.error(res.msg);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
   useEffect(() => {
     if (roleLeftSelected && tabSelected === "roleInfo") {
-      fetchApi
-        .get("/system/role/getRoleById", { roleId: roleLeftSelected })
-        .then((res) => {
-          if (res.code === 200) {
-            form.setFieldsValue({ ...res.data });
-          } else {
-            messageApi.error(res.msg);
-          }
-        });
+      getRoleInfo();
     }
-  }, [roleLeftSelected]);
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {};
+  }, [roleLeftSelected, tabSelected]);
+  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
+    fetchApi.post("/system/role/editRole", { ...values }).then((res) => {
+      if (res.code === 200) {
+        getRoleInfo();
+        setNeedUpdateRoleList(true);
+        messageApi.success("编辑成功");
+      } else {
+        messageApi.error(res.msg);
+      }
+    });
+  };
   return (
     <>
       {contextHolder}
-      <div>
-        {/* TODO 这里要写一个空白页面 */}
-        {roleLeftSelected ? (
+      {!loading ? (
+        <div>
           <Form
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 24 }}
@@ -48,6 +67,7 @@ export default function RoleInfo() {
             labelAlign="left"
             style={{ maxWidth: 800, marginTop: "20px" }}
             form={form}
+            onFinish={onFinish}
           >
             <Form.Item<FieldType>
               name="roleName"
@@ -84,10 +104,10 @@ export default function RoleInfo() {
               </Button>
             </Form.Item>
           </Form>
-        ) : (
-          <div></div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div></div>
+      )}
     </>
   );
 }

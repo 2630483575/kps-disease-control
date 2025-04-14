@@ -173,6 +173,7 @@ export default function LabelInfo() {
   };
   return (
     <>
+      {contextHolder}
       <div className="h-[100px] flex gap-4 flex-wrap">
         <div className="w-[300px]">
           <Input

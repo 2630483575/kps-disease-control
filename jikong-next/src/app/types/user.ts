@@ -31,3 +31,17 @@ export type roleDataType = {
   roleId?: number;
   roleName?: string;
 };
+export type RelatedDataType = {
+  key?: number;
+  id?: number;
+  userName?: string;
+  phoneNumber?: string;
+  email?: string;
+  roleName?: string;
+  createTime?: string;
+  status?: number;
+  sex?: number;
+  password?: string;
+  remark?: string;
+  userId?: number;
+};

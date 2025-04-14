@@ -13,9 +13,7 @@ const theme: ThemeConfig = {
       activeBarBorderWidth: 0,
     },
     Button: {},
-    Table: {
-      padding: 24,
-    },
+    Table: {},
   },
 };
 

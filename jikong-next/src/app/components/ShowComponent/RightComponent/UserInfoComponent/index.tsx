@@ -16,6 +16,8 @@ interface PaginationState extends TablePaginationConfig {
   current: number;
   pageSize: number;
   total: number;
+  showSizeChanger: boolean;
+  showTotal?: (total: number, range: [number, number]) => React.ReactNode;
 }
 
 type SearchProps = GetProps<typeof Input.Search>;
@@ -98,6 +100,8 @@ export default function UserInfo() {
     current: 1,
     pageSize: 10,
     total: 0,
+    showSizeChanger: true,
+    showTotal: (total) => `共 ${total} 条`,
   });
   const groupSelected = useUserLeftMenuStore(
     (state) => state.userLeftGroupSelected
@@ -119,6 +123,8 @@ export default function UserInfo() {
             current: res.data.currentPage,
             pageSize: res.data.pageSize,
             total: res.data.total,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条`,
           });
           const allUsers = res.data.userList;
           const newAllCoulumUser = allUsers.map((user: userResType) => {
@@ -146,6 +152,8 @@ export default function UserInfo() {
             current: res.data.currentPage,
             pageSize: res.data.pageSize,
             total: res.data.total,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条`,
           });
           const allUsers = JSON.parse(JSON.stringify(res.data.userList));
 
