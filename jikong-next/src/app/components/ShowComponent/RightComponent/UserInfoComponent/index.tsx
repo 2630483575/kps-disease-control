@@ -225,7 +225,7 @@ export default function UserInfo() {
   };
   const delUser = () => {
     fetchApi
-      .post("/system/user/deleteUserById", { userId: delUserId })
+      .post("/system/user/deleteUserById", { id: delUserId })
       .then((res) => {
         if (res.code === 200) {
           setIsShowDelModal(false);

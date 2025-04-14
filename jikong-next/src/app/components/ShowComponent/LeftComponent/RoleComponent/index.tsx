@@ -60,6 +60,7 @@ export default function RoleComponent() {
   useEffect(() => {
     if (needUpdate) {
       initRoleList();
+      setNeedUpdate(false);
     }
   }, [needUpdate]);
   return (

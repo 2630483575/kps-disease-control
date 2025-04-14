@@ -133,7 +133,7 @@ export default function RelatedUser() {
     getRelatedUserList(newPagination.current, newPagination.pageSize);
   };
   useEffect(() => {
-    if (roleLeftSelected && tabSelected === "relatedUser") {
+    if (roleLeftSelected && tabSelected === "RelatedUser") {
       getRelatedUserList();
     }
   }, [roleLeftSelected]);

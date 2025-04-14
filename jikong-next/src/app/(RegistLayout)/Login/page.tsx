@@ -5,7 +5,7 @@ import { Button, Form, Input, message } from "antd";
 import { useRouter } from "next/navigation";
 import fetchApi from "@/lib/fetchApi";
 import { useLoginUserStore } from "@/app/store/useLoginStore";
-import { convertSideMenu } from "@/app/utils/sideData";
+import { convertSideMenu, getPermTabs } from "@/app/utils/sideData";
 import { useSideStore } from "@/app/store/useSideStore";
 import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
 
@@ -24,7 +24,11 @@ export default function Login() {
         sessionStorage.setItem("tokenValue", res.data.tokenInfo.tokenValue);
         const menuList = convertSideMenu(res.data.menus);
         setSideMenu(menuList);
+        const permTabs = getPermTabs(res.data.menus);
+        sessionStorage.setItem("permTabs", JSON.stringify(permTabs));
+
         sessionStorage.setItem("menuList", JSON.stringify(menuList));
+        sessionStorage.setItem("originMenu", JSON.stringify(res.data.menus));
         setLoginUserInfo({ ...logInfo, loginId: res.data.tokenInfo.loginId });
         router.push("/System");
       } else {

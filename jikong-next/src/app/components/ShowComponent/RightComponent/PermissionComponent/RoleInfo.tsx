@@ -18,25 +18,23 @@ export default function RoleInfo() {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const tabSelected = useRoleLeftMenuStore((state) => state.tabSelected);
+  const [initialValues, setInitialValues] = useState<FieldType>({});
   const setNeedUpdateRoleList = useRoleLeftMenuStore(
     (state) => state.setNeedUpdateRoleList
   );
   const roleLeftSelected = useRoleLeftMenuStore(
     (state) => state.roleLeftSelected
   );
-  const [loading, setLoading] = useState(true);
   const getRoleInfo = () => {
     fetchApi
       .get("/system/role/getRoleById", { roleId: roleLeftSelected })
       .then((res) => {
         if (res.code === 200) {
+          setInitialValues({ ...res.data });
           form.setFieldsValue({ ...res.data });
         } else {
           messageApi.error(res.msg);
         }
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
   useEffect(() => {
@@ -58,8 +56,8 @@ export default function RoleInfo() {
   return (
     <>
       {contextHolder}
-      {!loading ? (
-        <div>
+      <div>
+        {roleLeftSelected ? (
           <Form
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 24 }}
@@ -68,6 +66,7 @@ export default function RoleInfo() {
             style={{ maxWidth: 800, marginTop: "20px" }}
             form={form}
             onFinish={onFinish}
+            initialValues={initialValues}
           >
             <Form.Item<FieldType>
               name="roleName"
@@ -90,10 +89,10 @@ export default function RoleInfo() {
               </Radio.Group>
             </Form.Item>
             <Form.Item<FieldType> label="创建人员" name="createBy">
-              <div>{form.getFieldValue("createBy")}</div>
+              <div>{initialValues.createBy}</div>
             </Form.Item>
             <Form.Item<FieldType> label="创建时间" name="createTime">
-              <div>{form.getFieldValue("createTime")}</div>
+              <div>{initialValues.createTime}</div>
             </Form.Item>
             <Form.Item<FieldType> label="备注" name="remark">
               <TextArea rows={4} />
@@ -104,10 +103,10 @@ export default function RoleInfo() {
               </Button>
             </Form.Item>
           </Form>
-        </div>
-      ) : (
-        <div></div>
-      )}
+        ) : (
+          <div></div>
+        )}
+      </div>
     </>
   );
 }

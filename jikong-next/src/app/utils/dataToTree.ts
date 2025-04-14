@@ -1,4 +1,6 @@
 import { IdeplistData } from "../types/dep";
+import { treeSingleType } from "../types/role";
+import type { TreeDataNode, TreeProps } from "antd";
 
 // 菜单权限根据接口数据转换成tree展示的数据格式generateKeys(data,'0')
 export const generateKeys: Function = (items: any[], parentKey: string) => {
@@ -25,33 +27,30 @@ export const generateKeys: Function = (items: any[], parentKey: string) => {
         });
   };
   const treeData = generate(items, parentKey);
+
   return { treeData, defaultKeysArray };
 };
 
 // 菜单权限根据tree展示调用接口 mapKeysArrayToOriginalData(["0-0"], data);
-export const mapKeysArrayToOriginalData = (keysArray: string[], items: any) => {
-  for (const key of keysArray) {
-    let currentLevel = items;
-    let currentItem;
-    const originKey = key.replace("0-", "");
-    const keyParts = originKey.split("-");
-
-    for (const part of keyParts) {
-      const index = parseInt(part);
-      currentItem = currentLevel[index];
-
-      if (!currentItem) {
-        console.log("Invalid key");
-        return;
+export const mapKeysArrayToOriginalData = (
+  infoArray: TreeDataNode[],
+  items: any
+) => {
+  const options = JSON.parse(JSON.stringify(items));
+  const nameList = infoArray.map((opt) => opt.title);
+  const updateSelected = (menuItems: any) => {
+    return menuItems.map((opt: any) => {
+      const ifSelected = nameList.includes(opt.menuName);
+      const updateItem = { ...opt, isSelected: ifSelected ? 1 : 0 };
+      if (opt.children) {
+        updateItem.children = updateSelected(opt.children);
       }
 
-      currentLevel = currentItem.children || [];
-    }
-
-    if (currentItem) {
-      currentItem.isSelected = 1;
-    }
-  }
+      return updateItem;
+    });
+  };
+  const reqData = updateSelected(options);
+  return reqData;
 };
 
 // 用户管理部门列表根据接口返回数据转换成menu的格式

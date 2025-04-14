@@ -4,85 +4,74 @@ import { Tree, Button, message } from "antd";
 import type { TreeDataNode, TreeProps } from "antd";
 import { useRoleLeftMenuStore } from "@/app/store/useRoleStore";
 import fetchApi from "@/lib/fetchApi";
-import { generateKeys } from "@/app/utils/dataToTree";
+import {
+  generateKeys,
+  mapKeysArrayToOriginalData,
+} from "@/app/utils/dataToTree";
 import { treeSingleType } from "@/app/types/role";
-
-const treeData: TreeDataNode[] = [
-  {
-    title: "语料采集",
-    key: "0-0",
-    children: [
-      {
-        title: "语料上传",
-        key: "0-0-0",
-      },
-      {
-        title: "语料维护",
-        key: "0-0-1",
-      },
-    ],
-  },
-  {
-    title: "语料应用",
-    key: "0-1",
-    children: [
-      {
-        title: "语料上传",
-        key: "0-1-0",
-      },
-      {
-        title: "语料维护",
-        key: "0-1-1",
-      },
-    ],
-  },
-  {
-    title: "语料管理",
-    key: "0-2",
-    children: [
-      {
-        title: "语料上传",
-        key: "0-2-0",
-      },
-      {
-        title: "语料维护",
-        key: "0-2-1",
-      },
-    ],
-  },
-  { title: "菜单权限", key: "0-" },
-];
 
 export default function MenuPermission() {
   const [messageApi, contextHolder] = message.useMessage();
   const tabSelected = useRoleLeftMenuStore((state) => state.tabSelected);
-  const canEditRoleList = useRoleLeftMenuStore(
-    (state) => state.canEditRoleList
-  );
+  const roleSelected = useRoleLeftMenuStore((state) => state.roleLeftSelected);
   const [treeData, setTreeData] = useState<treeSingleType[]>([]);
+  const [originMenu, setOriginMenu] = useState([]);
+  const [checkedInfo, setCheckedInfo] = useState<TreeDataNode[]>([]);
+  const selectedRoledId = useRoleLeftMenuStore(
+    (state) => state.roleLeftSelected
+  );
+  const [checkedKeys, setCheckedKeys] = useState<
+    string[] | { checked: string[]; halfChecked: string[] }
+  >([]);
   const roleLeftSelected = useRoleLeftMenuStore(
     (state) => state.roleLeftSelected
   );
   useEffect(() => {
-    if (roleLeftSelected && tabSelected === "menuPermission") {
-      fetchApi.get("/system/menu/select", { roleId: 1 }).then((res) => {
+    if (roleLeftSelected && tabSelected === "MenuPermission") {
+      fetchApi
+        .get("/system/menu/select", { roleId: roleSelected })
+        .then((res) => {
+          if (res.code === 200) {
+            const initPernmissionData = generateKeys(res.menuList, "0");
+            setOriginMenu(res.menuList);
+            setCheckedKeys(initPernmissionData.defaultKeysArray);
+            setTreeData(initPernmissionData.treeData);
+          } else {
+            messageApi.error(res.msg);
+          }
+        });
+    }
+  }, [roleLeftSelected, tabSelected]);
+  const onCheck: TreeProps["onCheck"] = (checkedKeys, info) => {
+    const keys = Array.isArray(checkedKeys) ? checkedKeys : checkedKeys.checked;
+    console.log(info);
+    setCheckedInfo(info.checkedNodes || []);
+    setCheckedKeys(keys.map(String));
+  };
+  const onClick = () => {
+    const reqData = mapKeysArrayToOriginalData(checkedInfo, originMenu);
+    fetchApi
+      .post("/system/menu/updateSelected", {
+        menuList: reqData,
+        roleId: selectedRoledId,
+      })
+      .then((res) => {
         if (res.code === 200) {
-          const initPernmissionData = generateKeys(res.menuList, "0");
-          setTreeData(initPernmissionData.treeData);
+          messageApi.success("编辑成功");
         } else {
           messageApi.error(res.msg);
         }
       });
-    }
-  }, [roleLeftSelected]);
-  const onCheck: TreeProps["onCheck"] = (checkedKeys, info) => {
-    console.log("onCheck", checkedKeys, info);
   };
-  const onClick = () => {};
 
   return (
     <>
-      <Tree checkable onCheck={onCheck} treeData={treeData} />
+      <Tree
+        checkable
+        onCheck={onCheck}
+        treeData={treeData}
+        checkedKeys={checkedKeys}
+      />
       <div className="flex justify-center mt-auto">
         <Button type="primary" className="w-[400px]" onClick={onClick}>
           保存修改
