@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Input, Button, Space, Table, Modal, Tag, message } from "antd";
 import type { GetProps, TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -67,6 +67,7 @@ interface PaginationState extends TablePaginationConfig {
   showTotal?: (total: number, range: [number, number]) => React.ReactNode;
 }
 export default function RelatedUser() {
+  const addRef = useRef<{ closeAdd: () => void }>(null);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [tableData, setTableData] = useState<relatedUserType[]>([]);
   const tabSelected = useRoleLeftMenuStore((state) => state.tabSelected);
@@ -142,7 +143,7 @@ export default function RelatedUser() {
   };
 
   const handleCancel = () => {
-    setIsAddUserModalOpen(false);
+    addRef.current?.closeAdd();
   };
 
   const closeAddModal = () => {
@@ -217,7 +218,7 @@ export default function RelatedUser() {
         width={1000}
         classNames={addModalClassNames}
       >
-        <AddRelatedUser closeModal={closeAddModal} />
+        <AddRelatedUser ref={addRef} closeModal={closeAddModal} />
       </Modal>
     </>
   );

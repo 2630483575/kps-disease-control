@@ -1,5 +1,10 @@
 "use client";
-import React, { useState, useEffect, useReducer } from "react";
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Input, Menu, Table, List, Button, message } from "antd";
 import type { GetProps, MenuProps, TransferProps } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
@@ -39,7 +44,7 @@ interface addProps {
   closeModal: () => void;
 }
 
-export default function AddRelatedUser({ closeModal }: addProps) {
+const AddRelatedUser = forwardRef(({ closeModal }: addProps, ref) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [userData, setUserData] = useState<DataType[]>([]);
   const [depMenu, setDepMenu] = useState<leftDepMenu[]>([]);
@@ -54,7 +59,7 @@ export default function AddRelatedUser({ closeModal }: addProps) {
 
   const [userPagination, setUserPagination] = useState<PaginationState>({
     current: 1,
-    pageSize: 10,
+    pageSize: 50,
     total: 0,
     showSizeChanger: true,
     showTotal: (total) => `共 ${total} 条`,
@@ -63,7 +68,8 @@ export default function AddRelatedUser({ closeModal }: addProps) {
     newSelectedRowKeys: React.Key[],
     selectedRows: DataType[]
   ) => {
-    setSelectedUserList(selectedRows);
+    const updateUserList = [...selectedUserList, ...selectedRows];
+    setSelectedUserList(updateUserList);
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection: TableRowSelection<DataType> = {
@@ -100,10 +106,13 @@ export default function AddRelatedUser({ closeModal }: addProps) {
       });
     }
   };
+  useImperativeHandle(ref, () => ({
+    closeAdd: closeAddModal,
+  }));
   const getUserList = (
     username: string,
     page: number = 1,
-    pageSize: number = 10
+    pageSize: number = 50
   ) => {
     fetchApi
       .post("/system/user/selectUsers", {
@@ -155,20 +164,22 @@ export default function AddRelatedUser({ closeModal }: addProps) {
     setDepInput("");
     setUserInput("");
     closeModal();
+    setActiveMenu(0);
   };
   const submit = () => {
     if (!roleLeftSelected) {
       messageApi.error("请选择角色");
     }
+    const userIdList = selectedUserList.map((opt) => opt.userId);
     fetchApi
       .post("/system/user/insertUserIdAndRoleId", {
         roleId: roleLeftSelected,
-        userIds: selectedRowKeys,
+        userIds: userIdList,
       })
       .then((res) => {
         if (res.code === 200) {
           messageApi.success(res.msg);
-          closeModal();
+          closeAddModal();
         } else {
           messageApi.error(res.msg);
         }
@@ -274,8 +285,12 @@ export default function AddRelatedUser({ closeModal }: addProps) {
       </div>
       <div className="flex justify-end gap-4">
         <Button onClick={closeAddModal}>取消</Button>
-        <Button onClick={submit}>确认</Button>
+        <Button onClick={submit} type="primary">
+          确认
+        </Button>
       </div>
     </>
   );
-}
+});
+
+export default AddRelatedUser;
