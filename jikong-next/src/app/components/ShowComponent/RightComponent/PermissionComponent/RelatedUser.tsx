@@ -218,7 +218,11 @@ export default function RelatedUser() {
         width={1000}
         classNames={addModalClassNames}
       >
-        <AddRelatedUser ref={addRef} closeModal={closeAddModal} />
+        <AddRelatedUser
+          ref={addRef}
+          closeModal={closeAddModal}
+          isAddUserModalOpen={isAddUserModalOpen}
+        />
       </Modal>
     </>
   );

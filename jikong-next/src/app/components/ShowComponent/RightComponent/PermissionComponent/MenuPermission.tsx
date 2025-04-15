@@ -44,7 +44,6 @@ export default function MenuPermission() {
   }, [roleLeftSelected, tabSelected]);
   const onCheck: TreeProps["onCheck"] = (checkedKeys, info) => {
     const keys = Array.isArray(checkedKeys) ? checkedKeys : checkedKeys.checked;
-    console.log(info);
     setCheckedInfo(info.checkedNodes || []);
     setCheckedKeys(keys.map(String));
   };
@@ -66,6 +65,7 @@ export default function MenuPermission() {
 
   return (
     <>
+      {contextHolder}
       <Tree
         checkable
         onCheck={onCheck}
