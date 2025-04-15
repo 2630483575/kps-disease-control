@@ -23,7 +23,7 @@ export default function AddRole({ closeModal, cancelModal }: addRoleProps) {
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     const userName =
       loginUserInfo.userName ??
-      JSON.parse(localStorage.getItem("logInfo") || "{}").userName;
+      JSON.parse(localStorage.getItem("userInfo") || "{}").username;
     fetchApi
       .post("/system/role/create", {
         ...values,

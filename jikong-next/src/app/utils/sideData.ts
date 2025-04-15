@@ -30,7 +30,7 @@ export const getPermTabs: Function = (
   const permArr =
     menuList
       .find((item) => (item.path = "System"))
-      ?.children.find((item) => item.path === "Perm")?.children || [];
+      ?.children?.find((item) => item.path === "Perm")?.children || [];
   return permArr.map((item, i) => {
     return {
       key: item.path,
