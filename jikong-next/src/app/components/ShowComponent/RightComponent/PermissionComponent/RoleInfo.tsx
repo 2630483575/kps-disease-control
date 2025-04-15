@@ -43,15 +43,17 @@ export default function RoleInfo() {
     }
   }, [roleLeftSelected, tabSelected]);
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    fetchApi.post("/system/role/editRole", { ...values }).then((res) => {
-      if (res.code === 200) {
-        getRoleInfo();
-        setNeedUpdateRoleList(true);
-        messageApi.success("编辑成功");
-      } else {
-        messageApi.error(res.msg);
-      }
-    });
+    fetchApi
+      .post("/system/role/editRole", { ...values, roleId: roleLeftSelected })
+      .then((res) => {
+        if (res.code === 200) {
+          getRoleInfo();
+          setNeedUpdateRoleList(true);
+          messageApi.success("编辑成功");
+        } else {
+          messageApi.error(res.msg);
+        }
+      });
   };
   return (
     <>

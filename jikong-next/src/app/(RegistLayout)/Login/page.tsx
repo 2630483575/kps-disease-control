@@ -29,6 +29,7 @@ export default function Login() {
 
         sessionStorage.setItem("menuList", JSON.stringify(menuList));
         sessionStorage.setItem("originMenu", JSON.stringify(res.data.menus));
+        localStorage.setItem("userInfo", JSON.stringify(logInfo));
         setLoginUserInfo({ ...logInfo, loginId: res.data.tokenInfo.loginId });
         router.push("/System");
       } else {

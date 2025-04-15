@@ -24,8 +24,10 @@ export default function Side() {
     if (savedMenu) {
       setSideMenu(JSON.parse(savedMenu));
     }
-    const activeOpenKey = pathName.split("/")[1];
-    const activeMenu = pathName.split("/")[2];
+    const activeOpenKey = pathName.split("/")[1] ?? "System";
+    const activeMenu = pathName.split("/")[2] ?? "User";
+    console.log(activeOpenKey, activeMenu);
+
     setActiveSideMenu(activeMenu);
     setOpenKeys([activeOpenKey]);
   }, []);
@@ -40,6 +42,7 @@ export default function Side() {
         items={sideItems}
         selectedKeys={[activeSideMenu]}
         openKeys={openKeys}
+        onOpenChange={(keys) => setOpenKeys(keys as string[])}
       />
     </div>
   );
